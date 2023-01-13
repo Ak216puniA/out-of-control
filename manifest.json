@@ -1,0 +1,13 @@
+{
+  "name": "Game",
+  "version": "0.0.1",
+  "manifest_version": 2,
+  "browser_action": {
+    "default_popup": "./src/index.html",
+    "default_icon": "./src/assets/logo.png"
+  },
+  "icons": {
+    "128": "./src/assets/logo.png"
+  },
+  "permissions": ["activeTab"]
+}
