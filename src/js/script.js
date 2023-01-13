@@ -2,7 +2,7 @@ import * as THREE from '../../node_modules/three/build/three.module.js'
 
 const renderer = new THREE.WebGL1Renderer()
 
-const screenWidth = window.innerWidth/2
+const screenWidth = window.innerWidth<=360 ? window.innerWidth : window.innerWidth/2
 const screenHeight = window.innerHeight
 
 console.log(screenWidth)
