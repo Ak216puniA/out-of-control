@@ -27,4 +27,10 @@ const cubeMaterial = new THREE.MeshBasicMaterial({
 const cube = new THREE.Mesh(cubeGeometry, cubeMaterial)
 scene.add(cube)
 
-renderer.render(scene, camera)
+function animate() {
+    cube.rotation.x -= 0.03
+    cube.rotation.y += 0.03
+    renderer.render(scene, camera)
+}
+
+renderer.setAnimationLoop(animate)
