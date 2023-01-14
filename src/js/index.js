@@ -7,7 +7,6 @@ const gameWindowHeight = screenHeight/screenWidth<1.5 ? screenHeight : screenWid
 const gameWindow = document.getElementsByClassName('gameWindow')
 const headingText = document.getElementsByClassName('headingText')
 const normalText = document.getElementsByClassName('normalText')
-const playButton = document.getElementById('playButton')
 
 if(screenHeight<=25 || screenWidth<=25){
     for(let i=0; i<gameWindow.length; i++){
@@ -36,8 +35,4 @@ if(screenHeight<=25 || screenWidth<=25){
     for(let i=0; i<normalText.length; i++){
         normalText[i].style.fontSize = `${normalFontSize}px`
     }
-}
-
-document.getElementById("playButton").onclick = function() {
-    window.location.href = "play.html"
 }

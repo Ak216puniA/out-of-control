@@ -24,3 +24,26 @@ body {
     flex-direction: column;
     align-items: center;
 }
+
+#header{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5.5% 5.5% 0 5.5%;
+}
+
+#fullscreenIconDiv{
+    width: 6%;
+    height: auto;
+}
+
+#helpIconDiv{
+    width: 7%;
+    height: auto;
+}
+
+.headerIcon{
+    width: 100%;
+    height: 100%;
+}
