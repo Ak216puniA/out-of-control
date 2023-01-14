@@ -43,3 +43,9 @@
 #gameScoreDiv{
     margin-bottom: 5%;
 }
+#Resume{
+    display: flex;
+    justify-content: center;
+    padding-bottom: 40px;
+
+}

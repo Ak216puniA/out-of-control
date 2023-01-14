@@ -40,3 +40,10 @@ if(screenHeight<=25 || screenWidth<=25){
 document.getElementById('exitButton').onclick = function (){
     window.location.href = "index.html"
 }
+document.getElementById('playAgainButton').onclick = function (){
+    window.location.href = "index.html"
+}
+document.getElementById('Resume').onclick = function (){
+    window.location.href = "index.html"
+}
+
