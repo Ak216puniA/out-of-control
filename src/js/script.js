@@ -12,8 +12,8 @@ const screenWidth = window.innerWidth
 const gameWindowWidth = screenHeight/screenWidth<1.5 ? screenHeight/1.5 : screenWidth
 const gameWindowHeight = screenHeight/screenWidth<1.5 ? screenHeight : screenWidth*1.5
 
-// const cubeSide = gameWindowWidth/7*2
-// console.log(cubeSide)
+const cubeSide = gameWindowWidth/4
+console.log(cubeSide)
 
 const renderer = new THREE.WebGL1Renderer()
 renderer.setSize(gameWindowWidth,gameWindowHeight)
@@ -29,17 +29,17 @@ const world = new CANNON.World({
 
 const timeStep = 1/60;
 
-const gridHelper = new THREE.GridHelper(100,100)
-scene.add(gridHelper)
+// const gridHelper = new THREE.GridHelper(100,100)
+// scene.add(gridHelper)
 
-const axesHelper = new THREE.AxesHelper(10)
+const axesHelper = new THREE.AxesHelper(1000)
 scene.add(axesHelper)
 
-camera.position.set(0,2,4)
+camera.position.set(0,2,5)
 camera.lookAt(0,0)
 orbit.update()
 
-const cubeGeometry = new THREE.BoxGeometry(2,2,2)
+const cubeGeometry = new THREE.BoxGeometry(1,1,1)
 const cubeMaterial = new THREE.MeshBasicMaterial({
     color: 0xEEEEEE
 })
@@ -62,6 +62,42 @@ const groundBody = new CANNON.Body({
 })
 world.addBody(groundBody)
 groundBody.quaternion.setFromEuler(-Math.PI/2,0,0)
+
+const lineMaterial = new THREE.LineBasicMaterial({
+    color: 0xFFFFFF
+});
+
+const pointsArray1 = [];
+pointsArray1.push( new THREE.Vector3( - 2, 0, 10 ) );
+pointsArray1.push( new THREE.Vector3( -2, 0, -10 ) );
+const lineGeometry1 = new THREE.BufferGeometry().setFromPoints( pointsArray1 );
+const line1 = new THREE.Line( lineGeometry1, lineMaterial );
+scene.add( line1 );
+
+const pointsArray2 = [];
+pointsArray2.push( new THREE.Vector3( 2, 0, 10 ) );
+pointsArray2.push( new THREE.Vector3( 2, 0, -10 ) );
+const lineGeometry2 = new THREE.BufferGeometry().setFromPoints( pointsArray2 );
+const line2 = new THREE.Line( lineGeometry2, lineMaterial );
+scene.add( line2 );
+
+
+const pointsArray3 = [];
+pointsArray3.push( new THREE.Vector3( 0, 0, 10 ) );
+pointsArray3.push( new THREE.Vector3( 0, 0, -10 ) );
+const lineGeometry3 = new THREE.BufferGeometry().setFromPoints( pointsArray3 );
+const line3 = new THREE.Line( lineGeometry3, lineMaterial );
+scene.add( line3 );
+
+const pointsArray4 = [];
+pointsArray4.push( new THREE.Vector3( -1, 0, 10 ) );
+pointsArray4.push( new THREE.Vector3( -1, 0, -10 ) );
+const lineGeometry4 = new THREE.BufferGeometry().setFromPoints( pointsArray4 );
+const line4 = new THREE.Line( lineGeometry4, lineMaterial );
+scene.add( line4 );
+
+
+
 
 let step = 0
 let speed = 0.05
