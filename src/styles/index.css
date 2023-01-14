@@ -5,11 +5,11 @@ body {
     justify-content: center;
     align-items: center;
     min-width: 360px;
-    min-height: 480px;
+    min-height: 540px;
 }
 
-#gameWindow{
-    background-image: url('../assets/background.svg');
+.gameWindow{
+    background-image: url('../assets/background-image.svg');
     background-color: #080E18;
     font-family: 'VT323';
     color: #48FAE4;
@@ -30,6 +30,27 @@ body {
 .centerDiv{
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
+}
+
+#gameNameDiv{
+    margin-top: 16%;
+    justify-content: flex-start;
+}
+
+#startPageImageDiv{
+    width: 100%;
+    margin-bottom: 8%;
+    justify-content: flex-end;
+}
+
+#startGameWindowDiv{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#startPageImage{
+    width: 60%;
+    height: auto
 }

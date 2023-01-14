@@ -4,27 +4,31 @@ const screenWidth = window.innerWidth
 const gameWindowWidth = screenHeight/screenWidth<1.5 ? screenHeight/1.5 : screenWidth
 const gameWindowHeight = screenHeight/screenWidth<1.5 ? screenHeight : screenWidth*1.5
 
-const gameWindow = document.getElementById('gameWindow')
+const gameWindow = document.getElementsByClassName('gameWindow')
 const headingText = document.getElementsByClassName('headingText')
 const normalText = document.getElementsByClassName('normalText')
 const playButton = document.getElementById('playButton')
 
 if(screenHeight<=25 || screenWidth<=25){
-    gameWindow.style.width = `100vw`
-    gameWindow.style.height = `100vh`
+    for(let i=0; i<gameWindow.length; i++){
+        gameWindow[i].style.width = `100vw`
+        gameWindow[i].style.height = `100vh`
+    }
 
     for(let i=0; i<headingText.length; i++){
-        headingText[i].style.fontSize = `17.4vw`
+        headingText[i].style.fontSize = `15vw`
     }
     for(let i=0; i<normalText.length; i++){
-        normalText[i].style.fontSize = `13.9vw`
+        normalText[i].style.fontSize = `12vw`
     }
 }else{
-    gameWindow.style.width = `${gameWindowWidth}px`
-    gameWindow.style.height = `${gameWindowHeight}px`
+    for(let i=0; i<gameWindow.length; i++){
+        gameWindow[i].style.width = `${gameWindowWidth}px`
+        gameWindow[i].style.height = `${gameWindowHeight}px`
+    }
 
-    const headingFontSize = gameWindowWidth*17.4/100
-    const normalFontSize = gameWindowWidth*13.9/100;
+    const headingFontSize = gameWindowWidth*15/100
+    const normalFontSize = gameWindowWidth*12/100;
 
     for(let i=0; i<headingText.length; i++){
         headingText[i].style.fontSize = `${headingFontSize}px`
