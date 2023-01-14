@@ -12,6 +12,7 @@ body {
     background-image: url('../assets/background-image.svg');
     background-color: #080E18;
     font-family: 'VT323';
+    position: relative;
 }
 
 .normalText{

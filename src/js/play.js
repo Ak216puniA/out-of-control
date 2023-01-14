@@ -36,3 +36,7 @@ if(screenHeight<=25 || screenWidth<=25){
         text4[i].style.fontSize = `${gameWindowWidth/5}px`
     }
 }
+
+document.getElementById('exitButton').onclick = function (){
+    window.location.href = "index.html"
+}
