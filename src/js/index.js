@@ -37,3 +37,7 @@ if(screenHeight<=25 || screenWidth<=25){
         normalText[i].style.fontSize = `${normalFontSize}px`
     }
 }
+
+document.getElementById("playButton").onclick = function() {
+    window.location.href = "play.html"
+}
