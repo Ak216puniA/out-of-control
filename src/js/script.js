@@ -2,6 +2,7 @@
 import * as THREE from '../../node_modules/three/build/three.module.js'
 import * as CANNON from '../../node_modules/cannon-es/dist/cannon-es.js'
 import OrbitControls from './OrbitControls.js'
+import {GLTFLoader} from './GLTFLoader.js'
 // import {OrbitControls} from '../../node_modules/three/examples/jsm/controls/OrbitControls.js'  
 // import { OrbitControls } from 'https://unpkg.com/three@0.138.3/examples/jsm/controls/OrbitControls.js';
 // import { OrbitControls } from './OrbitControls.js'
@@ -14,6 +15,7 @@ const gameWindowHeight = screenHeight/screenWidth<1.5 ? screenHeight : screenWid
 
 const cubeSide = gameWindowWidth/4
 console.log(cubeSide)
+
 
 const renderer = new THREE.WebGL1Renderer()
 renderer.setSize(gameWindowWidth,gameWindowHeight)
