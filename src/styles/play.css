@@ -1,0 +1,22 @@
+#playAgainButton{
+    background-color: #48FAE4;
+    border: none;
+    border-radius: 12px;
+    height: 1.5em;
+    padding: 0 0.5em;
+    font-family: 'VT323';
+}
+
+#exitButton{
+    background-color: transparent;
+    border: none;
+    border-radius: 12px;
+    height: 1.5em;
+    padding: 0 1em;
+    font-family: 'VT323';
+}
+
+#exitButton:hover{
+    background-color: #48FAE4;
+    opacity: 0.1;
+}
