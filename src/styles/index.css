@@ -1,35 +1,14 @@
-/* @media screen and (max-width: 360px){
-    body{
-        min-width: 240px; 
-    }
-}
-
-@media screen and (max-height: 720px){
-    body{
-        min-height: 480px;
-    }
-} */
-
-/* @media screen and (min-width: 720px) and (min-height: px){
-    body{
-        min-width: 240px;
-        min-height: 480px;
-    }
-} */
-
 body {
     margin: 0;
     display: flex;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
     min-width: 360px;
     min-height: 480px;
 }
 
-/* .startPageBody{
-    background-image: url("../assets/background.svg");
-} */
-
 #gameWindow{
-    background-color: aliceblue;
+    background-image: url('../assets/background.svg');
+    background-color: #080E18;
 }
