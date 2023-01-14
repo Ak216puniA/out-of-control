@@ -20,7 +20,7 @@ scene.add(axesHelper)
 
 camera.position.z = 5
 
-const cubeGeometry = new THREE.BoxGeometry()
+const cubeGeometry = new THREE.BoxGeometry(0.8,0.8,0.8)
 const cubeMaterial = new THREE.MeshBasicMaterial({
     color: 0xEEEEEE
 })
