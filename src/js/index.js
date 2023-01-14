@@ -1,5 +1,8 @@
 const screenHeight =  window.innerHeight
 const screenWidth = window.innerWidth
+console.log("hello")
+console.log(screenHeight)
+console.log(screenWidth)
 
 const gameWindowWidth = screenHeight/screenWidth<1.5 ? screenHeight/1.5 : screenWidth
 const gameWindowHeight = screenHeight/screenWidth<1.5 ? screenHeight : screenWidth*1.5
@@ -9,6 +12,7 @@ const headingText = document.getElementsByClassName('headingText')
 const normalText = document.getElementsByClassName('normalText')
 
 if(screenHeight<=25 || screenWidth<=25){
+    console.log("Hello");
     for(let i=0; i<gameWindow.length; i++){
         gameWindow[i].style.width = `100vw`
         gameWindow[i].style.height = `100vh`
