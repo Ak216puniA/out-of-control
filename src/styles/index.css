@@ -11,4 +11,25 @@ body {
 #gameWindow{
     background-image: url('../assets/background.svg');
     background-color: #080E18;
+    font-family: 'VT323';
+    color: #48FAE4;
+}
+
+.normalText{
+    font-family: 'VT323';
+}
+
+#playButton{
+    height: 1.125em;
+    border-radius: 0.562em;
+    padding: 0 0.5em;
+    border: none;
+    background-color: #48FAE4;
+}
+
+.centerDiv{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
