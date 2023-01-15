@@ -43,6 +43,7 @@ const gameWindowHeight = screenHeight/screenWidth<1.5 ? screenHeight : screenWid
 // });
 
 const cube = new URL('../assets/cube_actions.glb', import.meta.url)
+const spikesUrl=new URL('../assets/spikes.glb',import.meta.url)
 
 const renderer = new THREE.WebGL1Renderer()
 renderer.setSize(gameWindowWidth,gameWindowHeight)
@@ -216,17 +217,58 @@ assetLoader.load(cube.href, function(gltf){
     })
 })
 
+let spikes;
+var spikemixer;
+assetLoader.load(spikesUrl.href, function(glb){
+    console.log(glb)
+    spikes=glb.scene;
+},function(xhr){
+    console.log((xhr.loaded/xhr.total*100)+"% loaded")
+},function(error){
+    console.log('eror')
+});
+
+
+const spikesarray=[];
+function cloneSpikes(){
+    var a = Math.floor(Math.random()*3)*2-2;
+    const dimension=new THREE.Vector3(a,1,-5);
+    const spikeclone=spikes.clone();
+    spikeclone.position.copy(dimension);
+    scene.add(spikeclone);
+    console.log("helo");
+    spikesarray.push(spikeclone);
+    if(spikesarray.length>3){
+        spikesarray.pop();
+        console.log(spikearray.length)
+    }
+}
+
+var time=setInterval(cloneSpikes,5000);
+
+//create obstacles
+// const spikes_objects=[]
+// function create_spikes(){
+//     const spikesClone=spikes.clone()
+//     spikesClone.position.copy
+
+// }
+
 const clock = new THREE.Clock()
 
 function animate() {
     if(cubeMixer){
         cubeMixer.update(clock.getDelta())
     }
+    // if(spikemixer){
+    //     spikemixer.update(clock.getDelta())
+    // }
     // cube.rotation.x -= 0.03
     world.step(timeStep)
 
     groundMesh.position.copy(groundBody.position)
     groundMesh.quaternion.copy(groundBody.quaternion)
+    // spikesarray[0].position.y-=0.1;
 
     // step += speed
     // cube.position.y = Math.abs(Math.sin(step))
