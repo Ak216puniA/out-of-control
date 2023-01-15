@@ -13,8 +13,34 @@ const screenWidth = window.innerWidth
 const gameWindowWidth = screenHeight/screenWidth<1.5 ? screenHeight/1.5 : screenWidth
 const gameWindowHeight = screenHeight/screenWidth<1.5 ? screenHeight : screenWidth*1.5
 
-const cubeSide = gameWindowWidth/4
-console.log(cubeSide)
+// const cubeSide = gameWindowWidth/4
+// console.log(cubeSide)
+
+const spikesUrl=new URL('../assets/spikes.glb', import.meta.url);
+
+//GLTF
+// const loader=new GLTFLoader()
+// loader.load('./assets/spikes.glb',function(glb){
+//     console.log(glb)
+//     const root=glb.scene;
+//     scene.add(root);
+// },function(xhr){
+//     console.log((xhr.loaded/xhr.total*100)+"% loaded")
+// },function(error){
+//     console.log('error')
+// })
+const assetLoader = new GLTFLoader();
+// let mixer;
+assetLoader.load(spikesUrl.href, function(glb){
+    const model = glb.scene;
+    scene.add(model);  
+    // mixer = new THREE.AnimationMixer(model);
+    // const clips = THREE.AnimationClip.findByName(clips, 'spikes');
+    // const action = mixer.clipAction(clip);
+    // action.play(); 
+}, undefined, function(error){
+console.error(error);
+});
 
 
 const renderer = new THREE.WebGL1Renderer()
@@ -41,13 +67,13 @@ camera.position.set(0,2,5)
 camera.lookAt(0,0)
 orbit.update()
 
-const cubeGeometry = new THREE.BoxGeometry(1,1,1)
-const cubeMaterial = new THREE.MeshBasicMaterial({
-    color: 0xEEEEEE
-})
-const cube = new THREE.Mesh(cubeGeometry, cubeMaterial)
-scene.add(cube)
-cube.position.set(0,1,1)
+// const cubeGeometry = new THREE.BoxGeometry(1,1,1)
+// const cubeMaterial = new THREE.MeshBasicMaterial({
+//     color: 0xEEEEEE
+// })
+// const cube = new THREE.Mesh(cubeGeometry, cubeMaterial)
+// scene.add(cube)
+// cube.position.set(0,1,1)
 
 const groundGeo = new THREE.PlaneGeometry(100,100, 100, 100)
 const groundMat = new THREE.MeshBasicMaterial({
@@ -68,6 +94,15 @@ groundBody.quaternion.setFromEuler(-Math.PI/2,0,0)
 const lineMaterial = new THREE.LineBasicMaterial({
     color: 0xFFFFFF
 });
+
+//light
+const ambientLight = new THREE.AmbientLight(0xffffff);
+scene.add(ambientLight);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+scene.add(directionalLight);
+directionalLight.position.set(0, 10, 0);
+const dLightHelper = new THREE.DirectionalLightHelper(directionalLight);
+scene.add(dLightHelper)
 
 const pointsArray1 = [];
 pointsArray1.push( new THREE.Vector3( - 2, 0, 10 ) );
@@ -121,6 +156,7 @@ function animate() {
     renderer.render(scene, camera)
 }
 
+const clock=new THREE.Clock();
 document.addEventListener("keydown", onDocumentKeyDown, false);
 function onDocumentKeyDown(event) {
     var keyCode = event.which;
@@ -140,8 +176,15 @@ function onDocumentKeyDown(event) {
         new THREE.Vector3(-2,0.5,0),
         new THREE.Vector3(2,0,0)
     )
-    renderer.render(scene, camera)
+    render();
 };
 
-renderer.setAnimationLoop(animate)
+var render=function(time){
+    requestAnimationFrame(render);
+    if(mixer)
+        mixer.update(clock,getDelta());
+    renderer.render(scene,camera);
+}
+
+// renderer.setAnimationLoop(render)
 // renderer.render(scene, camera)
