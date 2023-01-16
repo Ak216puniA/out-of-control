@@ -25,20 +25,20 @@ const spikes = new URL('../assets/spikes.glb', import.meta.url)
 const wall = new URL('../assets/wall.glb', import.meta.url)
 const bar = new URL('../assets/bar.glb', import.meta.url)
 
-const timeStep = 1/60;
 const obstacleTypes = []
 const obstacles = []
 const obstacleSpeed = 0.1
-const cubeActionSpeedMultiplier = 3
+const cubeActionSpeedMultiplier = 4
 const clock = new THREE.Clock()
 
+scene.background = new THREE.Color(0x2B323E)
 camera.position.set(0,4,8)
 camera.lookAt(0,0)
 orbit.update()
 
-const trackGeometry = new THREE.PlaneGeometry(124816,124816)
+const trackGeometry = new THREE.PlaneGeometry(8,124)
 const trackMaterial = new THREE.MeshBasicMaterial({
-    color:0x273349,
+    color:0x080E18,
     side: THREE.DoubleSide,
 })
 const track = new THREE.Mesh(trackGeometry, trackMaterial)
@@ -94,26 +94,34 @@ assetLoader.load(cube.href, function(gltf){
     function onArrowClick(event){
         var key = event.key;
         if (key == 'a') {
-            goLeftAction.reset()
-            goLeftAction.play()
+            if(cubeModel.position.x>-2){
+                goLeftAction.reset()
+                goLeftAction.play()
+            }
         } else if (key == 'w') {
             jumpAction.reset()
             jumpAction.play()
         } else if (key == 'd') {
-            goRightAction.reset()
-            goRightAction.play()
+            if(cubeModel.position.x<2){
+                goRightAction.reset()
+                goRightAction.play()
+            } 
         } else if (key == 's') {
             duckAction.reset()
             duckAction.play()
         } else if (key == 'ArrowLeft'){
-            goLeftAction.reset()
-            goLeftAction.play()
+            if(cubeModel.position.x>-2){
+                goLeftAction.reset()
+                goLeftAction.play()
+            }
         } else if (key == 'ArrowUp'){
             jumpAction.reset()
             jumpAction.play()
         } else if (key == 'ArrowRight'){
-            goRightAction.reset()
-            goRightAction.play()
+            if(cubeModel.position.x<2){
+                goRightAction.reset()
+                goRightAction.play()
+            } 
         } else if (key == 'ArrowDown'){
             duckAction.reset()
             duckAction.play()
