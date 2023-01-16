@@ -1,7 +1,3 @@
-#playEndDiv{
-    
-}
-
 #playAgainButton{
     background-color: #48FAE4;
     border: none;
@@ -43,9 +39,9 @@
 #gameScoreDiv{
     margin-bottom: 5%;
 }
-#Resume{
+
+#resume{
     display: flex;
     justify-content: center;
     padding-bottom: 40px;
-
 }

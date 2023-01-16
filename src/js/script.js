@@ -1,12 +1,8 @@
-// import { OrbitControls } from '../../node_modules/three/examples/jsm/controls/OrbitControls.js'
 import * as THREE from '../../node_modules/three/build/three.module.js'
 import * as CANNON from '../../node_modules/cannon-es/dist/cannon-es.js'
 import OrbitControls from './OrbitControls.js'
-import {GLTFLoader} from './GLTFLoader.js'
-import { AdditiveAnimationBlendMode } from '../../node_modules/three/build/three.module.js'
-// import {OrbitControls} from '../../node_modules/three/examples/jsm/controls/OrbitControls.js'  
-// import { OrbitControls } from 'https://unpkg.com/three@0.138.3/examples/jsm/controls/OrbitControls.js';
-// import { OrbitControls } from './OrbitControls.js'
+import { GLTFLoader } from './GLTFLoader.js'
+// import { AdditiveAnimationBlendMode } from '../../node_modules/three/build/three.module.js'
 
 const screenHeight =  window.innerHeight
 const screenWidth = window.innerWidth
@@ -43,7 +39,9 @@ const gameWindowHeight = screenHeight/screenWidth<1.5 ? screenHeight : screenWid
 // });
 
 const cube = new URL('../assets/cube_actions.glb', import.meta.url)
-const spikesUrl=new URL('../assets/spikes.glb',import.meta.url)
+const spikes = new URL('../assets/spikes.glb', import.meta.url)
+const wall = new URL('../assets/wall.glb', import.meta.url)
+const bar = new URL('../assets/bar.glb', import.meta.url)
 
 const renderer = new THREE.WebGL1Renderer()
 renderer.setSize(gameWindowWidth,gameWindowHeight)
@@ -54,7 +52,7 @@ const camera = new THREE.PerspectiveCamera(75, gameWindowWidth/gameWindowHeight,
 const orbit = new OrbitControls(camera, renderer.domElement)
 // const orbit = new OrbitControls()
 const world = new CANNON.World({
-    gravity: new CANNON.Vec3(0, 0, 0.2)
+    gravity: new CANNON.Vec3(0, 0, 0)
 })
 
 const timeStep = 1/60;
@@ -136,38 +134,32 @@ scene.add(dLightHelper)
 // const line4 = new THREE.Line( lineGeometry4, lineMaterial );
 // scene.add( line4 );
 
-
-
-
-let step = 0
-let speed = 0.05
-
-// function jump() {
-
-// }
 const assetLoader = new GLTFLoader()
 var cubeMixer;
+var spikesMixer;
+var wallMixer;
+var barMixer;
 
 assetLoader.load(cube.href, function(gltf){
-    const model = gltf.scene
-    scene.add(model)
-    cubeMixer = new THREE.AnimationMixer(model)
+    const cubeModel = gltf.scene
+    scene.add(cubeModel)
+    cubeModel.name = "cube"
+    cubeMixer = new THREE.AnimationMixer(cubeModel)
     const clips = gltf.animations
-    console.log(clips)
 
     const goLeftClip = THREE.AnimationClip.findByName(clips, 'goLeft')
     const goLeftAction = cubeMixer.clipAction(goLeftClip)
-    goLeftAction.timeScale = 2
-    // goLeftAction.blendMode = AdditiveAnimationBlendMode
+    goLeftAction.timeScale = 3
     goLeftAction.loop = THREE.LoopOnce
 
     const goRightClip = THREE.AnimationClip.findByName(clips, 'goRight')
     const goRightAction = cubeMixer.clipAction(goRightClip)
-    goRightAction.timeScale = 2
+    goRightAction.timeScale = 3
     goRightAction.loop = THREE.LoopOnce
 
     const duckClip = THREE.AnimationClip.findByName(clips, 'duck')
     const duckAction = cubeMixer.clipAction(duckClip)
+    duckAction.timeScale = 2
     duckAction.loop = THREE.LoopOnce
 
     const idleClip = THREE.AnimationClip.findByName(clips, 'idle')
@@ -176,7 +168,7 @@ assetLoader.load(cube.href, function(gltf){
 
     const jumpClip = THREE.AnimationClip.findByName(clips, 'jump')
     const jumpAction = cubeMixer.clipAction(jumpClip)
-    jumpAction.timeScale = 2
+    jumpAction.timeScale = 3
     jumpAction.loop = THREE.LoopOnce
 
     document.addEventListener("keydown", onArrowClick, false);
@@ -197,8 +189,8 @@ assetLoader.load(cube.href, function(gltf){
         } else if (key == 13) {
             cube.position.set(0, 0, 0);
         }
-        if(model.position){
-            model.position.clamp(
+        if(cubeModel.position){
+            cubeModel.position.clamp(
                 new THREE.Vector3(-2,0.5,0),
                 new THREE.Vector3(2,0,0)
             )
@@ -208,43 +200,93 @@ assetLoader.load(cube.href, function(gltf){
 
     cubeMixer.addEventListener('finished', function(event){
         if(event.action._clip.name==='goLeft'){
-            if(model.position) model.position.x -= 2
+            if(cubeModel.position) cubeModel.position.x -= 2
         }
         if(event.action._clip.name==='goRight'){
-            if(model.position) model.position.x += 2
+            if(cubeModel.position) cubeModel.position.x += 2
         }
         renderer.render(scene, camera)
     })
 })
 
-let spikes;
-var spikemixer;
-assetLoader.load(spikesUrl.href, function(glb){
-    console.log(glb)
-    spikes=glb.scene;
-},function(xhr){
-    console.log((xhr.loaded/xhr.total*100)+"% loaded")
-},function(error){
-    console.log('eror')
-});
+const obstacleTypes = []
+assetLoader.load(spikes.href, function(gltf){
+    const spikesModel = gltf.scene
+    scene.add(spikesModel)
+    spikesModel.name = "obstacle"
+    spikesModel.position.set(0,0,-20)
+    spikesMixer = new THREE.AnimationMixer(spikesModel)
+    obstacleTypes.push(spikesModel)
+})
 
+assetLoader.load(wall.href, function(gltf){
+    const wallModel = gltf.scene
+    scene.add(wallModel)
+    wallModel.name = "obstacle"
+    wallModel.position.set(-2,0,-24)
+    wallMixer = new THREE.AnimationMixer(wallModel)
+    obstacleTypes.push(wallModel)
+})
 
-const spikesarray=[];
-function cloneSpikes(){
-    var a = Math.floor(Math.random()*3)*2-2;
-    const dimension=new THREE.Vector3(a,1,-5);
-    const spikeclone=spikes.clone();
-    spikeclone.position.copy(dimension);
-    scene.add(spikeclone);
-    console.log("helo");
-    spikesarray.push(spikeclone);
-    if(spikesarray.length>3){
-        spikesarray.pop();
-        console.log(spikearray.length)
+assetLoader.load(bar.href, function(gltf){
+    const barModel = gltf.scene
+    scene.add(barModel)
+    barModel.name = "obstacle"
+    barModel.position.set(2,0,-16)
+    barMixer = new THREE.AnimationMixer(barModel)
+    obstacleTypes.push(barModel)
+})
+
+const obstacles = []
+function createObstacle(){
+    const randomX = 2*Math.floor(Math.random() * 3) - 2;
+    const randomY = 0
+    const randomZ = -20
+    const obstaclePosition = new THREE.Vector3(randomX, randomY, randomZ)
+    const randomObstacle = Math.floor(Math.random() * 3);
+    if(obstacleTypes[randomObstacle]){
+        const newObstacle = obstacleTypes[randomObstacle].clone()
+        scene.add(newObstacle)
+        newObstacle.name = "obstacle"
+        newObstacle.position.copy(obstaclePosition)
+        obstacles.push(newObstacle)
     }
 }
 
-var time=setInterval(cloneSpikes,5000);
+function addObstacles() {
+    var randomDelay = Math.floor(Math.random() * 3) + 1;
+    createObstacle()
+    setTimeout(addObstacles, randomDelay*1000)
+}
+
+// let spikes;
+// var spikemixer;
+// assetLoader.load(spikesUrl.href, function(glb){
+//     console.log(glb)
+//     spikes=glb.scene;
+// },function(xhr){
+//     console.log((xhr.loaded/xhr.total*100)+"% loaded")
+// },function(error){
+//     console.log(error)
+// });
+
+
+// const spikesarray=[];
+// function cloneSpikes(){
+//     var a = Math.floor(Math.random()*3)*2-2;
+//     const dimension=new THREE.Vector3(a,1,-5);
+//     const spikeclone=spikes.clone();
+//     spikeclone.position.copy(dimension);
+//     scene.add(spikeclone);
+//     console.log("helo");
+//     spikesarray.push(spikeclone);
+//     if(spikesarray.length>3){
+//         spikesarray.pop();
+//         console.log(spikesarray.length)
+//     }
+// }
+
+// var time=setInterval(cloneSpikes,5000);
 
 //create obstacles
 // const spikes_objects=[]
@@ -254,16 +296,38 @@ var time=setInterval(cloneSpikes,5000);
 
 // }
 
-const clock = new THREE.Clock()
 
+let step = 0
+let speed = 0.05
+const clock = new THREE.Clock()
 function animate() {
     if(cubeMixer){
         cubeMixer.update(clock.getDelta())
     }
+
+    // if(scene.getObjectByName('obstacle')){
+    //     console.log(scene.getObjectByName('obstacle').length())
+    //     scene.getObjectByName('obstacle').position.z += 0.1
+    // }
+    // let randomDelay = Math.floor(Math.random() * 3) + 1;
+    //     setTimeout(function(){
+    //         console.log("random onstacle")
+    //     }, 3000)
+
+    // createObstacle()
+
+    // if(scene.getObjectByName('what-model')){
+    //     scene.getObjectByName('what-model').position.z -=0.01
+    // }
+    
     // if(spikemixer){
     //     spikemixer.update(clock.getDelta())
     // }
     // cube.rotation.x -= 0.03
+
+    // if(scene.getObjectByName('spikes')){
+    //     scene.getObjectByName('spikes').position.z += 0.05
+    // }
     world.step(timeStep)
 
     groundMesh.position.copy(groundBody.position)
@@ -305,5 +369,7 @@ function animate() {
 //     renderer.render(scene,camera);
 // }
 
+addObstacles()
 renderer.setAnimationLoop(animate)
+// addObstacles()
 // renderer.render(scene, camera)
