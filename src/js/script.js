@@ -28,7 +28,7 @@ const bar = new URL('../assets/bar.glb', import.meta.url)
 const obstacleTypes = []
 const obstacles = []
 const obstacleSpeed = 0.1
-const cubeActionSpeedMultiplier = 4
+const cubeActionSpeedMultiplier = 2
 const clock = new THREE.Clock()
 
 scene.background = new THREE.Color(0x2B323E)
@@ -47,11 +47,11 @@ track.rotateX(-Math.PI/2);
 
 const ambientLight = new THREE.AmbientLight(0xffffff);
 scene.add(ambientLight);
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-scene.add(directionalLight);
-directionalLight.position.set(0, 10, 0);
-const dLightHelper = new THREE.DirectionalLightHelper(directionalLight);
-scene.add(dLightHelper)
+// const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+// scene.add(directionalLight);
+// directionalLight.position.set(0, 100, 100);
+// const dLightHelper = new THREE.DirectionalLightHelper(directionalLight);
+// scene.add(dLightHelper)
 
 const assetLoader = new GLTFLoader()
 var cubeMixer;
@@ -65,6 +65,7 @@ assetLoader.load(cube.href, function(gltf){
     cubeModel.name = "cube"
     cubeMixer = new THREE.AnimationMixer(cubeModel)
     const clips = gltf.animations
+    console.log(clips)
 
     const goLeftClip = THREE.AnimationClip.findByName(clips, 'goLeft')
     const goLeftAction = cubeMixer.clipAction(goLeftClip)
@@ -76,10 +77,10 @@ assetLoader.load(cube.href, function(gltf){
     goRightAction.timeScale = cubeActionSpeedMultiplier
     goRightAction.loop = THREE.LoopOnce
 
-    const duckClip = THREE.AnimationClip.findByName(clips, 'duck')
-    const duckAction = cubeMixer.clipAction(duckClip)
-    duckAction.timeScale = cubeActionSpeedMultiplier
-    duckAction.loop = THREE.LoopOnce
+    // const duckClip = THREE.AnimationClip.findByName(clips, 'duck')
+    // const duckAction = cubeMixer.clipAction(duckClip)
+    // duckAction.timeScale = cubeActionSpeedMultiplier
+    // duckAction.loop = THREE.LoopOnce
 
     const idleClip = THREE.AnimationClip.findByName(clips, 'idle')
     const idleAction = cubeMixer.clipAction(idleClip)
@@ -107,8 +108,8 @@ assetLoader.load(cube.href, function(gltf){
                 goRightAction.play()
             } 
         } else if (key == 's') {
-            duckAction.reset()
-            duckAction.play()
+            // duckAction.reset()
+            // duckAction.play()
         } else if (key == 'ArrowLeft'){
             if(cubeModel.position.x>-2){
                 goLeftAction.reset()
@@ -123,8 +124,8 @@ assetLoader.load(cube.href, function(gltf){
                 goRightAction.play()
             } 
         } else if (key == 'ArrowDown'){
-            duckAction.reset()
-            duckAction.play()
+            // duckAction.reset()
+            // duckAction.play()
         }
         if(cubeModel.position){
             cubeModel.position.clamp(
@@ -137,10 +138,10 @@ assetLoader.load(cube.href, function(gltf){
 
     cubeMixer.addEventListener('finished', function(event){
         if(event.action._clip.name==='goLeft'){
-            if(cubeModel.position) cubeModel.position.x -= 2
+            if(cubeModel.position) cubeModel.position.x -= 1.75
         }
         if(event.action._clip.name==='goRight'){
-            if(cubeModel.position) cubeModel.position.x += 2
+            if(cubeModel.position) cubeModel.position.x += 1.75
         }
         renderer.render(scene, camera)
     })
@@ -159,6 +160,7 @@ assetLoader.load(wall.href, function(gltf){
     const wallModel = gltf.scene
     scene.add(wallModel)
     wallModel.position.set(-2,0,-24)
+    wallModel.rotateY(Math.PI/2)
     wallMixer = new THREE.AnimationMixer(wallModel)
     obstacleTypes.push(wallModel)
     obstacles.push(wallModel)
@@ -168,7 +170,6 @@ assetLoader.load(bar.href, function(gltf){
     const barModel = gltf.scene
     scene.add(barModel)
     barModel.position.set(2,0,-16)
-    barModel.rotateY(-Math.PI/2);
     barMixer = new THREE.AnimationMixer(barModel)
     obstacleTypes.push(barModel)
     obstacles.push(barModel)
