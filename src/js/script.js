@@ -1,6 +1,7 @@
 import * as THREE from '../../node_modules/three/build/three.module.js'
 import OrbitControls from './OrbitControls.js'
 import { GLTFLoader } from './GLTFLoader.js'
+// import gameBackground from '../assets/scene-background.jpeg'
 
 const screenHeight =  window.innerHeight
 const screenWidth = window.innerWidth
@@ -14,6 +15,7 @@ document.body.appendChild(renderer.domElement)
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(75, gameWindowWidth/gameWindowHeight, 0.1, 1000)
 const orbit = new OrbitControls(camera, renderer.domElement)
+const textureLoader = new THREE.TextureLoader()
 
 // const gridHelper = new THREE.GridHelper(100,100)
 // scene.add(gridHelper)
@@ -24,14 +26,20 @@ const cube = new URL('../assets/cube_actions.glb', import.meta.url)
 const spikes = new URL('../assets/spikes.glb', import.meta.url)
 const wall = new URL('../assets/wall.glb', import.meta.url)
 const bar = new URL('../assets/bar.glb', import.meta.url)
+// const gameBackground = new Image()
+// gameBackground.src = '../assets/background-image.svg'
+// console.log(gameBackground)
 
 const obstacleTypes = []
 const obstacles = []
+const lanePositions = [-1.75,0,1.75]
 const obstacleSpeed = 0.1
 const cubeActionSpeedMultiplier = 2
 const clock = new THREE.Clock()
 
-scene.background = new THREE.Color(0x2B323E)
+// scene.background = new THREE.Color(0x2980B9)
+// scene.background = textureLoader.load('https://media.istockphoto.com/id/1300208115/vector/triangle-cross-square-and-circle-illustration-rectangular-on-dark-blue-background.jpg?s=612x612&w=0&k=20&c=foWrqO-8DrO_8HsZcYvZNB_M8qfyNftUCEMGEUYU3o4=')
+scene.background = textureLoader.load('/src/assets/background-image.svg')
 camera.position.set(0,4,8)
 camera.lookAt(0,0)
 orbit.update()
@@ -47,11 +55,11 @@ track.rotateX(-Math.PI/2);
 
 const ambientLight = new THREE.AmbientLight(0xffffff);
 scene.add(ambientLight);
-// const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-// scene.add(directionalLight);
-// directionalLight.position.set(0, 100, 100);
-// const dLightHelper = new THREE.DirectionalLightHelper(directionalLight);
-// scene.add(dLightHelper)
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+scene.add(directionalLight);
+directionalLight.position.set(0, 10, 0);
+const dLightHelper = new THREE.DirectionalLightHelper(directionalLight);
+scene.add(dLightHelper)
 
 const assetLoader = new GLTFLoader()
 var cubeMixer;
@@ -77,10 +85,10 @@ assetLoader.load(cube.href, function(gltf){
     goRightAction.timeScale = cubeActionSpeedMultiplier
     goRightAction.loop = THREE.LoopOnce
 
-    // const duckClip = THREE.AnimationClip.findByName(clips, 'duck')
-    // const duckAction = cubeMixer.clipAction(duckClip)
-    // duckAction.timeScale = cubeActionSpeedMultiplier
-    // duckAction.loop = THREE.LoopOnce
+    const duckClip = THREE.AnimationClip.findByName(clips, 'duck')
+    const duckAction = cubeMixer.clipAction(duckClip)
+    duckAction.timeScale = cubeActionSpeedMultiplier
+    duckAction.loop = THREE.LoopOnce
 
     const idleClip = THREE.AnimationClip.findByName(clips, 'idle')
     const idleAction = cubeMixer.clipAction(idleClip)
@@ -95,7 +103,7 @@ assetLoader.load(cube.href, function(gltf){
     function onArrowClick(event){
         var key = event.key;
         if (key == 'a') {
-            if(cubeModel.position.x>-2){
+            if(cubeModel.position.x>lanePositions[0]){
                 goLeftAction.reset()
                 goLeftAction.play()
             }
@@ -103,15 +111,15 @@ assetLoader.load(cube.href, function(gltf){
             jumpAction.reset()
             jumpAction.play()
         } else if (key == 'd') {
-            if(cubeModel.position.x<2){
+            if(cubeModel.position.x<lanePositions[2]){
                 goRightAction.reset()
                 goRightAction.play()
             } 
         } else if (key == 's') {
-            // duckAction.reset()
-            // duckAction.play()
+            duckAction.reset()
+            duckAction.play()
         } else if (key == 'ArrowLeft'){
-            if(cubeModel.position.x>-2){
+            if(cubeModel.position.x>lanePositions[0]){
                 goLeftAction.reset()
                 goLeftAction.play()
             }
@@ -119,13 +127,13 @@ assetLoader.load(cube.href, function(gltf){
             jumpAction.reset()
             jumpAction.play()
         } else if (key == 'ArrowRight'){
-            if(cubeModel.position.x<2){
+            if(cubeModel.position.x<lanePositions[2]){
                 goRightAction.reset()
                 goRightAction.play()
             } 
         } else if (key == 'ArrowDown'){
-            // duckAction.reset()
-            // duckAction.play()
+            duckAction.reset()
+            duckAction.play()
         }
         if(cubeModel.position){
             cubeModel.position.clamp(
@@ -150,7 +158,7 @@ assetLoader.load(cube.href, function(gltf){
 assetLoader.load(spikes.href, function(gltf){
     const spikesModel = gltf.scene
     scene.add(spikesModel)
-    spikesModel.position.set(0,0,-20)
+    spikesModel.position.set(lanePositions[1],0,-20)
     spikesMixer = new THREE.AnimationMixer(spikesModel)
     obstacleTypes.push(spikesModel)
     obstacles.push(spikesModel)
@@ -159,8 +167,7 @@ assetLoader.load(spikes.href, function(gltf){
 assetLoader.load(wall.href, function(gltf){
     const wallModel = gltf.scene
     scene.add(wallModel)
-    wallModel.position.set(-2,0,-24)
-    wallModel.rotateY(Math.PI/2)
+    wallModel.position.set(lanePositions[0],0,-24)
     wallMixer = new THREE.AnimationMixer(wallModel)
     obstacleTypes.push(wallModel)
     obstacles.push(wallModel)
@@ -169,14 +176,15 @@ assetLoader.load(wall.href, function(gltf){
 assetLoader.load(bar.href, function(gltf){
     const barModel = gltf.scene
     scene.add(barModel)
-    barModel.position.set(2,0,-16)
+    barModel.position.set(lanePositions[2],0,-16)
     barMixer = new THREE.AnimationMixer(barModel)
     obstacleTypes.push(barModel)
     obstacles.push(barModel)
 })
 
 function createObstacle(){
-    const randomX = 2*Math.floor(Math.random() * 3) - 2;
+    const randomLane = Math.floor(Math.random() * 3)
+    const randomX = lanePositions[randomLane]
     const randomY = 0
     const randomZ = -60
     const obstaclePosition = new THREE.Vector3(randomX, randomY, randomZ)
