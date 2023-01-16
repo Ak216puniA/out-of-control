@@ -1,5 +1,4 @@
 import * as THREE from '../../node_modules/three/build/three.module.js'
-import * as CANNON from '../../node_modules/cannon-es/dist/cannon-es.js'
 import OrbitControls from './OrbitControls.js'
 import { GLTFLoader } from './GLTFLoader.js'
 
@@ -15,9 +14,6 @@ document.body.appendChild(renderer.domElement)
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(75, gameWindowWidth/gameWindowHeight, 0.1, 1000)
 const orbit = new OrbitControls(camera, renderer.domElement)
-// const world = new CANNON.World({
-//     gravity: new CANNON.Vec3(0, 0, 0)
-// })
 
 // const gridHelper = new THREE.GridHelper(100,100)
 // scene.add(gridHelper)
@@ -48,13 +44,6 @@ const trackMaterial = new THREE.MeshBasicMaterial({
 const track = new THREE.Mesh(trackGeometry, trackMaterial)
 scene.add(track)
 track.rotateX(-Math.PI/2);
-
-// const trackBody = new CANNON.Body({
-//     shape: new CANNON.Plane(),
-//     mass: 1,
-// })
-// world.addBody(trackBody)
-// trackBody.quaternion.setFromEuler(-Math.PI/2,0,0)
 
 const ambientLight = new THREE.AmbientLight(0xffffff);
 scene.add(ambientLight);
@@ -131,7 +120,7 @@ assetLoader.load(cube.href, function(gltf){
         }
         if(cubeModel.position){
             cubeModel.position.clamp(
-                new THREE.Vector3(-2,0.5,0),
+                new THREE.Vector3(-2,0,0),
                 new THREE.Vector3(2,0,0)
             )
         }
@@ -210,10 +199,6 @@ function animate() {
     for(let i=0; i<obstacles.length; i++){
         obstacles[i].position.z += obstacleSpeed
     }
-
-    // world.step(timeStep)
-    // track.position.copy(trackBody.position)
-    // track.quaternion.copy(trackBody.quaternion)
 
     renderer.render(scene, camera)
 }
