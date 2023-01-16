@@ -1,7 +1,6 @@
 import * as THREE from '../../node_modules/three/build/three.module.js'
 import OrbitControls from './OrbitControls.js'
 import { GLTFLoader } from './GLTFLoader.js'
-// import gameBackground from '../assets/scene-background.jpeg'
 
 const screenHeight =  window.innerHeight
 const screenWidth = window.innerWidth
@@ -26,21 +25,17 @@ const cube = new URL('../assets/cube_actions.glb', import.meta.url)
 const spikes = new URL('../assets/spikes.glb', import.meta.url)
 const wall = new URL('../assets/wall.glb', import.meta.url)
 const bar = new URL('../assets/bar.glb', import.meta.url)
-// const gameBackground = new Image()
-// gameBackground.src = '../assets/background-image.svg'
-// console.log(gameBackground)
 
 const obstacleTypes = []
 const obstacles = []
+const obstacleBBs = []
 const lanePositions = [-1.75,0,1.75]
 const obstacleSpeed = 0.1
-const cubeActionSpeedMultiplier = 2
+const cubeActionSpeedMultiplier = 3
 const clock = new THREE.Clock()
 
-// scene.background = new THREE.Color(0x2980B9)
-// scene.background = textureLoader.load('https://media.istockphoto.com/id/1300208115/vector/triangle-cross-square-and-circle-illustration-rectangular-on-dark-blue-background.jpg?s=612x612&w=0&k=20&c=foWrqO-8DrO_8HsZcYvZNB_M8qfyNftUCEMGEUYU3o4=')
 scene.background = textureLoader.load('/src/assets/background-image.svg')
-camera.position.set(0,4,8)
+camera.position.set(0,3,6)
 camera.lookAt(0,0)
 orbit.update()
 
@@ -67,13 +62,17 @@ var spikesMixer;
 var wallMixer;
 var barMixer;
 
+var cubeBoundingBox;
+var cubeModel;
+
 assetLoader.load(cube.href, function(gltf){
-    const cubeModel = gltf.scene
+    cubeModel = gltf.scene
     scene.add(cubeModel)
+    cubeBoundingBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
+    cubeBoundingBox.setFromObject(cubeModel)
     cubeModel.name = "cube"
     cubeMixer = new THREE.AnimationMixer(cubeModel)
     const clips = gltf.animations
-    console.log(clips)
 
     const goLeftClip = THREE.AnimationClip.findByName(clips, 'goLeft')
     const goLeftAction = cubeMixer.clipAction(goLeftClip)
@@ -158,19 +157,25 @@ assetLoader.load(cube.href, function(gltf){
 assetLoader.load(spikes.href, function(gltf){
     const spikesModel = gltf.scene
     scene.add(spikesModel)
-    spikesModel.position.set(lanePositions[1],0,-20)
+    spikesModel.position.set(lanePositions[0],0,-20)
     spikesMixer = new THREE.AnimationMixer(spikesModel)
     obstacleTypes.push(spikesModel)
     obstacles.push(spikesModel)
+    var obstacleBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
+    obstacleBB.setFromObject(spikesModel)
+    obstacleBBs.push(obstacleBB)
 })
 
 assetLoader.load(wall.href, function(gltf){
     const wallModel = gltf.scene
     scene.add(wallModel)
-    wallModel.position.set(lanePositions[0],0,-24)
+    wallModel.position.set(lanePositions[1],0,-24)
     wallMixer = new THREE.AnimationMixer(wallModel)
     obstacleTypes.push(wallModel)
     obstacles.push(wallModel)
+    var obstacleBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
+    obstacleBB.setFromObject(wallModel)
+    obstacleBBs.push(obstacleBB)
 })
 
 assetLoader.load(bar.href, function(gltf){
@@ -180,6 +185,9 @@ assetLoader.load(bar.href, function(gltf){
     barMixer = new THREE.AnimationMixer(barModel)
     obstacleTypes.push(barModel)
     obstacles.push(barModel)
+    var obstacleBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
+    obstacleBB.setFromObject(barModel)
+    obstacleBBs.push(obstacleBB)
 })
 
 function createObstacle(){
@@ -194,6 +202,9 @@ function createObstacle(){
         scene.add(newObstacle)
         newObstacle.position.copy(obstaclePosition)
         obstacles.push(newObstacle)
+        var obstacleBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
+        obstacleBB.setFromObject(newObstacle)
+        obstacleBBs.push(obstacleBB)
     }
 }
 
@@ -206,15 +217,25 @@ function addObstacles() {
 function animate() {
     if(cubeMixer) cubeMixer.update(clock.getDelta())
 
+    // if(cubeModel){
+    //     if(cubeBoundingBox){
+    //         cubeBoundingBox.copy(cubeModel.geometry.getBoundingBox).applyMatrix4(cubeModel.matrixWorld)
+    //         console.log(cubeBoundingBox)
+    //         console.log("eh")
+    //     }
+    // }
+
     if(obstacles.length>0){
         if(obstacles[0].position.z>5) {
             scene.remove(obstacles[0])
             obstacles.shift()
+            obstacleBBs.shift()
         }
     }
 
     for(let i=0; i<obstacles.length; i++){
         obstacles[i].position.z += obstacleSpeed
+        // obstacleBBs[i].copy(obstacles[i].geometry.boundingBox).applyMatrix4(obstacles[i].matrixWorld)
     }
 
     renderer.render(scene, camera)
