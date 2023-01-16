@@ -210,44 +210,48 @@ assetLoader.load(cube.href, function(gltf){
 })
 
 const obstacleTypes = []
+const obstacles = []
+
 assetLoader.load(spikes.href, function(gltf){
     const spikesModel = gltf.scene
     scene.add(spikesModel)
-    spikesModel.name = "obstacle"
+    // spikesModel.name = "obstacle"
     spikesModel.position.set(0,0,-20)
     spikesMixer = new THREE.AnimationMixer(spikesModel)
     obstacleTypes.push(spikesModel)
+    obstacles.push(spikesModel)
 })
 
 assetLoader.load(wall.href, function(gltf){
     const wallModel = gltf.scene
     scene.add(wallModel)
-    wallModel.name = "obstacle"
+    // wallModel.name = "obstacle"
     wallModel.position.set(-2,0,-24)
     wallMixer = new THREE.AnimationMixer(wallModel)
     obstacleTypes.push(wallModel)
+    obstacles.push(wallModel)
 })
 
 assetLoader.load(bar.href, function(gltf){
     const barModel = gltf.scene
     scene.add(barModel)
-    barModel.name = "obstacle"
+    // barModel.name = "obstacle"
     barModel.position.set(2,0,-16)
     barMixer = new THREE.AnimationMixer(barModel)
     obstacleTypes.push(barModel)
+    obstacles.push(barModel)
 })
 
-const obstacles = []
 function createObstacle(){
     const randomX = 2*Math.floor(Math.random() * 3) - 2;
     const randomY = 0
-    const randomZ = -20
+    const randomZ = -60
     const obstaclePosition = new THREE.Vector3(randomX, randomY, randomZ)
     const randomObstacle = Math.floor(Math.random() * 3);
     if(obstacleTypes[randomObstacle]){
         const newObstacle = obstacleTypes[randomObstacle].clone()
         scene.add(newObstacle)
-        newObstacle.name = "obstacle"
+        // newObstacle.name = "obstacle"
         newObstacle.position.copy(obstaclePosition)
         obstacles.push(newObstacle)
     }
@@ -297,12 +301,22 @@ function addObstacles() {
 // }
 
 
-let step = 0
-let speed = 0.05
+const obstacleSpeed = 0.05
 const clock = new THREE.Clock()
 function animate() {
     if(cubeMixer){
         cubeMixer.update(clock.getDelta())
+    }
+
+    if(obstacles.length>0){
+        if(obstacles[0].position.z>5) {
+            scene.remove(obstacles[0])
+            obstacles.shift()
+        }
+    }
+
+    for(let i=0; i<obstacles.length; i++){
+        obstacles[i].position.z += obstacleSpeed
     }
 
     // if(scene.getObjectByName('obstacle')){
