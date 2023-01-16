@@ -1,0 +1,29 @@
+#playButton{
+    height: 1.125em;
+    border-radius: 0.562em;
+    padding: 0 0.5em;
+    border: none;
+    background-color: #48FAE4;
+}
+
+#gameNameDiv{
+    margin-top: 16%;
+    justify-content: flex-start;
+}
+
+#startPageImageDiv{
+    width: 100%;
+    margin-bottom: 8%;
+    justify-content: flex-end;
+}
+
+#startGameWindowDiv{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#startPageImage{
+    width: 60%;
+    height: auto
+}

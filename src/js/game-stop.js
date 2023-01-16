@@ -46,4 +46,3 @@ document.getElementById('playAgainButton').onclick = function (){
 document.getElementById('Resume').onclick = function (){
     window.location.href = "index.html"
 }
-

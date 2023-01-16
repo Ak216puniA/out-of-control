@@ -1,3 +1,3 @@
 document.getElementById("playButton").onclick = function() {
-    window.location.href = "play.html"
+    window.location.href = "game.html"
 }
