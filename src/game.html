@@ -6,18 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./styles/game-stop.css">
     <link rel="stylesheet" href="./styles/index.css">
+    <link rel="stylesheet" href="./styles/game.css">
     <link href='https://fonts.googleapis.com/css?family=VT323' rel='stylesheet'>
+    <script src="https://kit.fontawesome.com/765f34396c.js" crossorigin="anonymous"></script>
     <title>EXTENSION</title>
   </head>
   <body>
-    <script src="./js/index.js" type="module"></script>
-    <!-- <script src="./js/game-stop.js" type="module"></script> -->
+    <div class="gameWindow" id="gameDiv">
+      <div id="gameHeader">
+        <div id="gamePauseIconDiv">
+          <i class="fa-solid fa-pause" id="gamePauseIcon"></i>
+        </div>
+      </div>
+      <script src="./js/index.js" type="module"></script>
+    </div>
+    <script src="./js/game-stop.js" type="module"></script>
     <!-- <div class="gameWindow" id="playEndDiv">
-      <div id="header">
+      <div class="header">
         <div class="headerIconDiv" id="helpIconDiv">
           <img src="./assets/help.svg" class="headerIcon">
         </div>
-        <div class="headerIconDiv" id="fullscreenIconDiv">
+        <div class="headerIconDiv fullscreenIconDiv">
           <img src="./assets/fullscreen.svg" class="headerIcon">
         </div>
       </div>
@@ -39,11 +48,11 @@
     </div> -->
     <script src="./js/script.js" type="module"></script>
     <!-- <div class = "gameWindow">
-      <div id="header">
+      <div class="header">
         <div class="headerIconDiv" id="helpIconDiv">
           <img src="./assets/help.svg" class="headerIcon">
         </div>
-        <div class="headerIconDiv" id="fullscreenIconDiv">
+        <div class="headerIconDiv fullscreenIconDiv">
           <img src="./assets/fullscreen.svg" class="headerIcon">
         </div>
       </div>

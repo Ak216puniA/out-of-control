@@ -9,7 +9,9 @@ const gameWindowHeight = screenHeight/screenWidth<1.5 ? screenHeight : screenWid
 
 const renderer = new THREE.WebGL1Renderer()
 renderer.setSize(gameWindowWidth,gameWindowHeight)
+renderer.domElement.id = 'gameCanvas'
 document.body.appendChild(renderer.domElement)
+// document.getElementById('gameDiv').appendChild(renderer.domElement)
 
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(75, gameWindowWidth/gameWindowHeight, 0.1, 1000)
@@ -33,6 +35,9 @@ const lanePositions = [-1.75,0,1.75]
 const obstacleSpeed = 0.1
 const cubeActionSpeedMultiplier = 3
 const clock = new THREE.Clock()
+
+var highScore = 0
+var score = 0
 
 scene.background = textureLoader.load('/src/assets/background-image.svg')
 camera.position.set(0,3,6)
@@ -226,6 +231,11 @@ function animate() {
     // }
 
     if(obstacles.length>0){
+
+        if(obstacles[0].position.z==0){
+
+        }
+
         if(obstacles[0].position.z>5) {
             scene.remove(obstacles[0])
             obstacles.shift()
