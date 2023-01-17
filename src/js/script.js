@@ -14,6 +14,7 @@ document.body.appendChild(renderer.domElement)
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(75, gameWindowWidth/gameWindowHeight, 0.1, 1000)
 const orbit = new OrbitControls(camera, renderer.domElement)
+const textureLoader = new THREE.TextureLoader()
 
 // const gridHelper = new THREE.GridHelper(100,100)
 // scene.add(gridHelper)
@@ -25,20 +26,22 @@ const spikes = new URL('../assets/spikes.glb', import.meta.url)
 const wall = new URL('../assets/wall.glb', import.meta.url)
 const bar = new URL('../assets/bar.glb', import.meta.url)
 
-const timeStep = 1/60;
 const obstacleTypes = []
 const obstacles = []
+const obstacleBBs = []
+const lanePositions = [-1.75,0,1.75]
 const obstacleSpeed = 0.1
 const cubeActionSpeedMultiplier = 3
 const clock = new THREE.Clock()
 
-camera.position.set(0,4,8)
+scene.background = textureLoader.load('/src/assets/background-image.svg')
+camera.position.set(0,3,6)
 camera.lookAt(0,0)
 orbit.update()
 
-const trackGeometry = new THREE.PlaneGeometry(124816,124816)
+const trackGeometry = new THREE.PlaneGeometry(8,124)
 const trackMaterial = new THREE.MeshBasicMaterial({
-    color:0x273349,
+    color:0x080E18,
     side: THREE.DoubleSide,
 })
 const track = new THREE.Mesh(trackGeometry, trackMaterial)
@@ -59,9 +62,14 @@ var spikesMixer;
 var wallMixer;
 var barMixer;
 
+var cubeBoundingBox;
+var cubeModel;
+
 assetLoader.load(cube.href, function(gltf){
-    const cubeModel = gltf.scene
+    cubeModel = gltf.scene
     scene.add(cubeModel)
+    cubeBoundingBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
+    cubeBoundingBox.setFromObject(cubeModel)
     cubeModel.name = "cube"
     cubeMixer = new THREE.AnimationMixer(cubeModel)
     const clips = gltf.animations
@@ -94,26 +102,34 @@ assetLoader.load(cube.href, function(gltf){
     function onArrowClick(event){
         var key = event.key;
         if (key == 'a') {
-            goLeftAction.reset()
-            goLeftAction.play()
+            if(cubeModel.position.x>lanePositions[0]){
+                goLeftAction.reset()
+                goLeftAction.play()
+            }
         } else if (key == 'w') {
             jumpAction.reset()
             jumpAction.play()
         } else if (key == 'd') {
-            goRightAction.reset()
-            goRightAction.play()
+            if(cubeModel.position.x<lanePositions[2]){
+                goRightAction.reset()
+                goRightAction.play()
+            } 
         } else if (key == 's') {
             duckAction.reset()
             duckAction.play()
         } else if (key == 'ArrowLeft'){
-            goLeftAction.reset()
-            goLeftAction.play()
+            if(cubeModel.position.x>lanePositions[0]){
+                goLeftAction.reset()
+                goLeftAction.play()
+            }
         } else if (key == 'ArrowUp'){
             jumpAction.reset()
             jumpAction.play()
         } else if (key == 'ArrowRight'){
-            goRightAction.reset()
-            goRightAction.play()
+            if(cubeModel.position.x<lanePositions[2]){
+                goRightAction.reset()
+                goRightAction.play()
+            } 
         } else if (key == 'ArrowDown'){
             duckAction.reset()
             duckAction.play()
@@ -129,10 +145,10 @@ assetLoader.load(cube.href, function(gltf){
 
     cubeMixer.addEventListener('finished', function(event){
         if(event.action._clip.name==='goLeft'){
-            if(cubeModel.position) cubeModel.position.x -= 2
+            if(cubeModel.position) cubeModel.position.x -= 1.75
         }
         if(event.action._clip.name==='goRight'){
-            if(cubeModel.position) cubeModel.position.x += 2
+            if(cubeModel.position) cubeModel.position.x += 1.75
         }
         renderer.render(scene, camera)
     })
@@ -141,33 +157,42 @@ assetLoader.load(cube.href, function(gltf){
 assetLoader.load(spikes.href, function(gltf){
     const spikesModel = gltf.scene
     scene.add(spikesModel)
-    spikesModel.position.set(0,0,-20)
+    spikesModel.position.set(lanePositions[0],0,-20)
     spikesMixer = new THREE.AnimationMixer(spikesModel)
     obstacleTypes.push(spikesModel)
     obstacles.push(spikesModel)
+    var obstacleBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
+    obstacleBB.setFromObject(spikesModel)
+    obstacleBBs.push(obstacleBB)
 })
 
 assetLoader.load(wall.href, function(gltf){
     const wallModel = gltf.scene
     scene.add(wallModel)
-    wallModel.position.set(-2,0,-24)
+    wallModel.position.set(lanePositions[1],0,-24)
     wallMixer = new THREE.AnimationMixer(wallModel)
     obstacleTypes.push(wallModel)
     obstacles.push(wallModel)
+    var obstacleBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
+    obstacleBB.setFromObject(wallModel)
+    obstacleBBs.push(obstacleBB)
 })
 
 assetLoader.load(bar.href, function(gltf){
     const barModel = gltf.scene
     scene.add(barModel)
-    barModel.position.set(2,0,-16)
-    barModel.rotateY(-Math.PI/2);
+    barModel.position.set(lanePositions[2],0,-16)
     barMixer = new THREE.AnimationMixer(barModel)
     obstacleTypes.push(barModel)
     obstacles.push(barModel)
+    var obstacleBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
+    obstacleBB.setFromObject(barModel)
+    obstacleBBs.push(obstacleBB)
 })
 
 function createObstacle(){
-    const randomX = 2*Math.floor(Math.random() * 3) - 2;
+    const randomLane = Math.floor(Math.random() * 3)
+    const randomX = lanePositions[randomLane]
     const randomY = 0
     const randomZ = -60
     const obstaclePosition = new THREE.Vector3(randomX, randomY, randomZ)
@@ -177,6 +202,9 @@ function createObstacle(){
         scene.add(newObstacle)
         newObstacle.position.copy(obstaclePosition)
         obstacles.push(newObstacle)
+        var obstacleBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
+        obstacleBB.setFromObject(newObstacle)
+        obstacleBBs.push(obstacleBB)
     }
 }
 
@@ -189,15 +217,25 @@ function addObstacles() {
 function animate() {
     if(cubeMixer) cubeMixer.update(clock.getDelta())
 
+    // if(cubeModel){
+    //     if(cubeBoundingBox){
+    //         cubeBoundingBox.copy(cubeModel.geometry.getBoundingBox).applyMatrix4(cubeModel.matrixWorld)
+    //         console.log(cubeBoundingBox)
+    //         console.log("eh")
+    //     }
+    // }
+
     if(obstacles.length>0){
         if(obstacles[0].position.z>5) {
             scene.remove(obstacles[0])
             obstacles.shift()
+            obstacleBBs.shift()
         }
     }
 
     for(let i=0; i<obstacles.length; i++){
         obstacles[i].position.z += obstacleSpeed
+        // obstacleBBs[i].copy(obstacles[i].geometry.boundingBox).applyMatrix4(obstacles[i].matrixWorld)
     }
 
     renderer.render(scene, camera)
