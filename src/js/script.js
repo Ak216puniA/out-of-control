@@ -9,6 +9,7 @@ const gameWindowHeight = screenHeight/screenWidth<1.5 ? screenHeight : screenWid
 
 const renderer = new THREE.WebGL1Renderer()
 renderer.setSize(gameWindowWidth,gameWindowHeight)
+renderer.domElement.id = 'gameCanvas'
 document.body.appendChild(renderer.domElement)
 
 const scene = new THREE.Scene()
@@ -30,9 +31,13 @@ const obstacleTypes = []
 const obstacles = []
 const obstacleBBs = []
 const lanePositions = [-1.75,0,1.75]
-const obstacleSpeed = 0.1
 const cubeActionSpeedMultiplier = 3
+const increaseScoreTimeDelay = 200
 const clock = new THREE.Clock()
+var obstacleSpeed = 0.1
+var obstacleAppearanceTimeDelay = 3
+var score = 0
+var controlKeys = JSON.parse(localStorage.getItem('controlKeys'))
 
 scene.background = textureLoader.load('/src/assets/background-image.svg')
 camera.position.set(0,3,6)
@@ -101,36 +106,36 @@ assetLoader.load(cube.href, function(gltf){
     document.addEventListener("keydown", onArrowClick, false);
     function onArrowClick(event){
         var key = event.key;
-        if (key == 'a') {
+        if (key == controlKeys[0][0]) {
             if(cubeModel.position.x>lanePositions[0]){
                 goLeftAction.reset()
                 goLeftAction.play()
             }
-        } else if (key == 'w') {
+        } else if (key == controlKeys[1][0]) {
             jumpAction.reset()
             jumpAction.play()
-        } else if (key == 'd') {
+        } else if (key == controlKeys[2][0]) {
             if(cubeModel.position.x<lanePositions[2]){
                 goRightAction.reset()
                 goRightAction.play()
             } 
-        } else if (key == 's') {
+        } else if (key == controlKeys[3][0]) {
             duckAction.reset()
             duckAction.play()
-        } else if (key == 'ArrowLeft'){
+        } else if (key == controlKeys[0][1]){
             if(cubeModel.position.x>lanePositions[0]){
                 goLeftAction.reset()
                 goLeftAction.play()
             }
-        } else if (key == 'ArrowUp'){
+        } else if (key == controlKeys[1][1]){
             jumpAction.reset()
             jumpAction.play()
-        } else if (key == 'ArrowRight'){
+        } else if (key == controlKeys[2][1]){
             if(cubeModel.position.x<lanePositions[2]){
                 goRightAction.reset()
                 goRightAction.play()
             } 
-        } else if (key == 'ArrowDown'){
+        } else if (key == controlKeys[3][1]){
             duckAction.reset()
             duckAction.play()
         }
@@ -157,6 +162,7 @@ assetLoader.load(cube.href, function(gltf){
 assetLoader.load(spikes.href, function(gltf){
     const spikesModel = gltf.scene
     scene.add(spikesModel)
+    spikesModel.name = 'spikes'
     spikesModel.position.set(lanePositions[0],0,-20)
     spikesMixer = new THREE.AnimationMixer(spikesModel)
     obstacleTypes.push(spikesModel)
@@ -169,6 +175,7 @@ assetLoader.load(spikes.href, function(gltf){
 assetLoader.load(wall.href, function(gltf){
     const wallModel = gltf.scene
     scene.add(wallModel)
+    wallModel.name = 'wall'
     wallModel.position.set(lanePositions[1],0,-24)
     wallMixer = new THREE.AnimationMixer(wallModel)
     obstacleTypes.push(wallModel)
@@ -181,6 +188,7 @@ assetLoader.load(wall.href, function(gltf){
 assetLoader.load(bar.href, function(gltf){
     const barModel = gltf.scene
     scene.add(barModel)
+    barModel.name = 'bar'
     barModel.position.set(lanePositions[2],0,-16)
     barMixer = new THREE.AnimationMixer(barModel)
     obstacleTypes.push(barModel)
@@ -209,23 +217,48 @@ function createObstacle(){
 }
 
 function addObstacles() {
-    var randomDelay = Math.floor(Math.random() * 3) + 1;
+    var randomDelay = (Math.random() * obstacleAppearanceTimeDelay) + 1;
     createObstacle()
     setTimeout(addObstacles, randomDelay*1000)
+}
+
+function increaseScore() {
+    localStorage.setItem('globalScore', ++score)
+    document.getElementById('globalScore').innerHTML = score
+}
+
+function randomizeControls() {
+    let keys = JSON.parse(localStorage.getItem('controlKeys'))
+    let j;
+    for(let i=keys.length; i>0; i--){
+        j = Math.floor(Math.random() * i)
+        if(j!=i) keys[i-1] = [ keys[j], keys[j] = keys[i-1]][0]
+    }
+    localStorage.setItem('controlKeys', JSON.stringify(keys))
+}
+
+function increaseObstacleSpeed() {
+    obstacleSpeed+=0.0005
+    if(obstacleAppearanceTimeDelay>0.5) obstacleAppearanceTimeDelay-=0.001
 }
 
 function animate() {
     if(cubeMixer) cubeMixer.update(clock.getDelta())
 
-    // if(cubeModel){
-    //     if(cubeBoundingBox){
-    //         cubeBoundingBox.copy(cubeModel.geometry.getBoundingBox).applyMatrix4(cubeModel.matrixWorld)
-    //         console.log(cubeBoundingBox)
-    //         console.log("eh")
-    //     }
-    // }
-
     if(obstacles.length>0){
+
+        if(obstacles[0].position.z>5){
+            if(obstacles[0].name==='spikes'){
+                score+=33
+            }else if(obstacles[0].name==='wall'){
+                score+=59
+            }else if(obstacles[0].name==='bar'){
+                score+=68
+            }
+            localStorage.setItem('globalScore', score)
+            document.getElementById('globalScore').innerHTML = score
+        }
+
         if(obstacles[0].position.z>5) {
             scene.remove(obstacles[0])
             obstacles.shift()
@@ -235,11 +268,17 @@ function animate() {
 
     for(let i=0; i<obstacles.length; i++){
         obstacles[i].position.z += obstacleSpeed
-        // obstacleBBs[i].copy(obstacles[i].geometry.boundingBox).applyMatrix4(obstacles[i].matrixWorld)
     }
 
     renderer.render(scene, camera)
 }
 
+if(JSON.parse(localStorage.getItem('gameEnd'))){
+    randomizeControls()
+    controlKeys = JSON.parse(localStorage.getItem('controlKeys'))
+    localStorage.setItem('gameEnd', JSON.stringify(false))
+}
+setInterval(increaseObstacleSpeed, 250)
+setInterval(increaseScore, increaseScoreTimeDelay)
 addObstacles()
 renderer.setAnimationLoop(animate)

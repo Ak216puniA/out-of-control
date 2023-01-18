@@ -1,0 +1,56 @@
+#gameDiv{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+#gameCanvas{
+    position: absolute;
+    top: 0;
+    z-index: 1;
+}
+
+#gameHeader{
+    position: absolute;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 5.5%;
+    width: 100%;
+}
+
+#gamePauseIconDiv{
+    padding: 0.5em 0.8em;
+    border: 1px solid white;
+    border-radius: 4px;
+    margin: 0 5.5%;
+}
+
+#gameStopIconDiv{
+    border: 1px solid white;
+    border-radius: 4px;
+    padding: 0.5em 0.6em;
+    margin: 0 5.5%;
+}
+
+#gamePauseIconDiv:hover{
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+#gamePauseIcon{
+    color: #FFFFFF;
+    font-size: 20px;
+}
+
+#gameStopIcon{
+    color: #FFFFFF;
+    font-size: 20px;
+}
+
+#gameStopIconDiv:hover{
+    background-color: rgba(205, 97, 85, 0.25 );
+}
