@@ -1,6 +1,7 @@
 import * as THREE from '../../node_modules/three/build/three.module.js'
 import OrbitControls from './OrbitControls.js'
 import { GLTFLoader } from './GLTFLoader.js'
+import { globalScore } from './global.js'
 
 const screenHeight =  window.innerHeight
 const screenWidth = window.innerWidth
@@ -11,7 +12,6 @@ const renderer = new THREE.WebGL1Renderer()
 renderer.setSize(gameWindowWidth,gameWindowHeight)
 renderer.domElement.id = 'gameCanvas'
 document.body.appendChild(renderer.domElement)
-// document.getElementById('gameDiv').appendChild(renderer.domElement)
 
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(75, gameWindowWidth/gameWindowHeight, 0.1, 1000)
@@ -32,12 +32,16 @@ const obstacleTypes = []
 const obstacles = []
 const obstacleBBs = []
 const lanePositions = [-1.75,0,1.75]
-const obstacleSpeed = 0.1
+const obstacleSpeed = 0.8
 const cubeActionSpeedMultiplier = 3
+const obstacleAppearanceTimeDelay = 8
+const increaseScoreTimeDelay = 200
 const clock = new THREE.Clock()
 
-var highScore = 0
+// var highScore = 0
 var score = 0
+// console.log(globalScore)
+console.log(localStorage.getItem('globalScore'))
 
 scene.background = textureLoader.load('/src/assets/background-image.svg')
 camera.position.set(0,3,6)
@@ -214,26 +218,25 @@ function createObstacle(){
 }
 
 function addObstacles() {
-    var randomDelay = Math.floor(Math.random() * 3) + 1;
+    var randomDelay = Math.floor(Math.random() * obstacleAppearanceTimeDelay) + 1;
     createObstacle()
     setTimeout(addObstacles, randomDelay*1000)
+}
+
+function increaseScore() {
+    localStorage.setItem('globalScore', ++score)
+    document.getElementById('globalScore').innerHTML = score
 }
 
 function animate() {
     if(cubeMixer) cubeMixer.update(clock.getDelta())
 
-    // if(cubeModel){
-    //     if(cubeBoundingBox){
-    //         cubeBoundingBox.copy(cubeModel.geometry.getBoundingBox).applyMatrix4(cubeModel.matrixWorld)
-    //         console.log(cubeBoundingBox)
-    //         console.log("eh")
-    //     }
-    // }
-
     if(obstacles.length>0){
 
-        if(obstacles[0].position.z==0){
-
+        if(obstacles[0].position.z>5){
+            score+=68
+            localStorage.setItem('globalScore', score)
+            document.getElementById('globalScore').innerHTML = score
         }
 
         if(obstacles[0].position.z>5) {
@@ -245,11 +248,12 @@ function animate() {
 
     for(let i=0; i<obstacles.length; i++){
         obstacles[i].position.z += obstacleSpeed
-        // obstacleBBs[i].copy(obstacles[i].geometry.boundingBox).applyMatrix4(obstacles[i].matrixWorld)
     }
 
     renderer.render(scene, camera)
 }
+
+setInterval(increaseScore, increaseScoreTimeDelay)
 
 addObstacles()
 renderer.setAnimationLoop(animate)
