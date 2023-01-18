@@ -217,7 +217,7 @@ function createObstacle(){
 }
 
 function addObstacles() {
-    var randomDelay = Math.floor(Math.random() * obstacleAppearanceTimeDelay) + 1;
+    var randomDelay = (Math.random() * obstacleAppearanceTimeDelay) + 1;
     createObstacle()
     setTimeout(addObstacles, randomDelay*1000)
 }
@@ -235,6 +235,11 @@ function randomizeControls() {
         if(j!=i) keys[i-1] = [ keys[j], keys[j] = keys[i-1]][0]
     }
     localStorage.setItem('controlKeys', JSON.stringify(keys))
+}
+
+function increaseObstacleSpeed() {
+    obstacleSpeed+=0.0005
+    if(obstacleAppearanceTimeDelay>0.5) obstacleAppearanceTimeDelay-=0.001
 }
 
 function animate() {
@@ -273,6 +278,7 @@ if(JSON.parse(localStorage.getItem('gameEnd'))){
     controlKeys = JSON.parse(localStorage.getItem('controlKeys'))
     localStorage.setItem('gameEnd', JSON.stringify(false))
 }
+setInterval(increaseObstacleSpeed, 250)
 setInterval(increaseScore, increaseScoreTimeDelay)
 addObstacles()
 renderer.setAnimationLoop(animate)
