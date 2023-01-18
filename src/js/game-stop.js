@@ -37,12 +37,21 @@ if(screenHeight<=25 || screenWidth<=25){
     }
 }
 
+if(document.getElementById('gameScore')){
+    document.getElementById('gameScore').innerHTML = localStorage.getItem('globalScore')
+}
+
+document.getElementById('gameHighScore').innerHTML = localStorage.getItem('globalHighScore')
+
 document.getElementById('exitButton').onclick = function (){
     window.location.href = "index.html"
 }
 document.getElementById('playAgainButton').onclick = function (){
     window.location.href = "game.html"
 }
-document.getElementById('resume').onclick = function (){
-    window.location.href = "game.html"
+
+if(document.getElementById('resume')){
+    document.getElementById('resume').onclick = function (){
+        window.location.href = "game.html"
+    }
 }

@@ -1,7 +1,6 @@
 import * as THREE from '../../node_modules/three/build/three.module.js'
 import OrbitControls from './OrbitControls.js'
 import { GLTFLoader } from './GLTFLoader.js'
-import { globalScore } from './global.js'
 
 const screenHeight =  window.innerHeight
 const screenWidth = window.innerWidth
@@ -32,16 +31,12 @@ const obstacleTypes = []
 const obstacles = []
 const obstacleBBs = []
 const lanePositions = [-1.75,0,1.75]
-const obstacleSpeed = 0.8
+const obstacleSpeed = 0.1
 const cubeActionSpeedMultiplier = 3
-const obstacleAppearanceTimeDelay = 8
+const obstacleAppearanceTimeDelay = 3
 const increaseScoreTimeDelay = 200
 const clock = new THREE.Clock()
-
-// var highScore = 0
 var score = 0
-// console.log(globalScore)
-console.log(localStorage.getItem('globalScore'))
 
 scene.background = textureLoader.load('/src/assets/background-image.svg')
 camera.position.set(0,3,6)
@@ -166,6 +161,7 @@ assetLoader.load(cube.href, function(gltf){
 assetLoader.load(spikes.href, function(gltf){
     const spikesModel = gltf.scene
     scene.add(spikesModel)
+    spikesModel.name = 'spikes'
     spikesModel.position.set(lanePositions[0],0,-20)
     spikesMixer = new THREE.AnimationMixer(spikesModel)
     obstacleTypes.push(spikesModel)
@@ -178,6 +174,7 @@ assetLoader.load(spikes.href, function(gltf){
 assetLoader.load(wall.href, function(gltf){
     const wallModel = gltf.scene
     scene.add(wallModel)
+    wallModel.name = 'wall'
     wallModel.position.set(lanePositions[1],0,-24)
     wallMixer = new THREE.AnimationMixer(wallModel)
     obstacleTypes.push(wallModel)
@@ -190,6 +187,7 @@ assetLoader.load(wall.href, function(gltf){
 assetLoader.load(bar.href, function(gltf){
     const barModel = gltf.scene
     scene.add(barModel)
+    barModel.name = 'bar'
     barModel.position.set(lanePositions[2],0,-16)
     barMixer = new THREE.AnimationMixer(barModel)
     obstacleTypes.push(barModel)
@@ -234,7 +232,13 @@ function animate() {
     if(obstacles.length>0){
 
         if(obstacles[0].position.z>5){
-            score+=68
+            if(obstacles[0].name==='spikes'){
+                score+=33
+            }else if(obstacles[0].name==='wall'){
+                score+=59
+            }else if(obstacles[0].name==='bar'){
+                score+=68
+            }
             localStorage.setItem('globalScore', score)
             document.getElementById('globalScore').innerHTML = score
         }
@@ -254,6 +258,5 @@ function animate() {
 }
 
 setInterval(increaseScore, increaseScoreTimeDelay)
-
 addObstacles()
 renderer.setAnimationLoop(animate)
