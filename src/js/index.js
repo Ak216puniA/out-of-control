@@ -1,8 +1,5 @@
 const screenHeight =  window.innerHeight
 const screenWidth = window.innerWidth
-console.log("hello")
-console.log(screenHeight)
-console.log(screenWidth)
 
 const gameWindowWidth = screenHeight/screenWidth<1.5 ? screenHeight/1.5 : screenWidth
 const gameWindowHeight = screenHeight/screenWidth<1.5 ? screenHeight : screenWidth*1.5
