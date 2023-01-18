@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./styles/game-stop.css">
+    <link rel="stylesheet" href="./styles/index.css">
+    <link href='https://fonts.googleapis.com/css?family=VT323' rel='stylesheet'>
+    <script src="https://kit.fontawesome.com/765f34396c.js" crossorigin="anonymous"></script>
+    <title>EXTENSION</title>
+  </head>
+  <body>
+    <script src="./js/index.js" type="module"></script>
+    <script src="./js/game-stop.js" type="module"></script>
+
+    <div class="gameWindow" id="gameEndDiv">
+        <div class="header">
+            <div class="headerIconDiv" id="helpIconDiv">
+            <img src="./assets/help.svg" class="headerIcon">
+            </div>
+            <div class="headerIconDiv fullscreenIconDiv">
+            <img src="./assets/fullscreen.svg" class="headerIcon">
+            </div>
+        </div>
+        <div class="centerDiv whiteText">
+            <div class="text1">High score</div>
+            <div class="text2">0000</div>
+        </div>
+        <div class="centerDiv" id="gameScoreDiv">
+            <div class="text3 gameText">GAME OVER!</div>
+            <div class="text4 whiteText">0000</div>
+        </div>
+        <div class="centerDiv">
+            <button class="text2" id="playAgainButton">PLAY AGAIN!</button>
+            <button class="text2 whiteText" id="exitButton">EXIT?</button>
+        </div>
+        <div id="sadCubeImageDiv">
+            <img src="./assets/sad-cube.svg" id="sadCubeImage">
+        </div>
+    </div>
+  </body>
+</html>

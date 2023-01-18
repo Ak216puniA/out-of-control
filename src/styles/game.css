@@ -30,10 +30,27 @@
     margin: 0 5.5%;
 }
 
+#gameStopIconDiv{
+    border: 1px solid white;
+    border-radius: 4px;
+    padding: 0.5em 0.6em;
+    margin: 0 5.5%;
+}
+
 #gamePauseIconDiv:hover{
     background-color: rgba(255, 255, 255, 0.25);
 }
 
 #gamePauseIcon{
     color: #FFFFFF;
+    font-size: 20px;
+}
+
+#gameStopIcon{
+    color: #FFFFFF;
+    font-size: 20px;
+}
+
+#gameStopIconDiv:hover{
+    background-color: rgba(205, 97, 85, 0.25 );
 }
