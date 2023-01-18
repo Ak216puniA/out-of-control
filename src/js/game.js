@@ -11,5 +11,5 @@ document.getElementById('gameStopIconDiv').onclick = function() {
     if(localStorage.getItem('globalScore')>localStorage.getItem('globalHighScore')){
         localStorage.setItem('globalHighScore',localStorage.getItem('globalScore'))
     }
-    // localStorage.setItem('gameEnd', JSON.stringify(true))
+    localStorage.setItem('gameEnd', JSON.stringify(true))
 }

@@ -2,7 +2,6 @@ import * as THREE from '../../node_modules/three/build/three.module.js'
 import OrbitControls from './OrbitControls.js'
 import { GLTFLoader } from './GLTFLoader.js'
 
-console.log(localStorage.getItem('controlKeys'))
 const screenHeight =  window.innerHeight
 const screenWidth = window.innerWidth
 const gameWindowWidth = screenHeight/screenWidth<1.5 ? screenHeight/1.5 : screenWidth
@@ -38,7 +37,7 @@ const clock = new THREE.Clock()
 var obstacleSpeed = 0.1
 var obstacleAppearanceTimeDelay = 3
 var score = 0
-var controlKeys = localStorage.getItem('controlKeys')
+var controlKeys = JSON.parse(localStorage.getItem('controlKeys'))
 
 scene.background = textureLoader.load('/src/assets/background-image.svg')
 camera.position.set(0,3,6)
@@ -80,9 +79,6 @@ assetLoader.load(cube.href, function(gltf){
     cubeMixer = new THREE.AnimationMixer(cubeModel)
     const clips = gltf.animations
 
-    console.log("Hello babe!")
-    console.log(controlKeys)
-
     const goLeftClip = THREE.AnimationClip.findByName(clips, 'goLeft')
     const goLeftAction = cubeMixer.clipAction(goLeftClip)
     goLeftAction.timeScale = cubeActionSpeedMultiplier
@@ -110,40 +106,6 @@ assetLoader.load(cube.href, function(gltf){
     document.addEventListener("keydown", onArrowClick, false);
     function onArrowClick(event){
         var key = event.key;
-        // if (key == 'a') {
-        //     if(cubeModel.position.x>lanePositions[0]){
-        //         goLeftAction.reset()
-        //         goLeftAction.play()
-        //     }
-        // } else if (key == 'w') {
-        //     jumpAction.reset()
-        //     jumpAction.play()
-        // } else if (key == 'd') {
-        //     if(cubeModel.position.x<lanePositions[2]){
-        //         goRightAction.reset()
-        //         goRightAction.play()
-        //     } 
-        // } else if (key == 's') {
-        //     duckAction.reset()
-        //     duckAction.play()
-        // } else if (key == 'ArrowLeft'){
-        //     if(cubeModel.position.x>lanePositions[0]){
-        //         goLeftAction.reset()
-        //         goLeftAction.play()
-        //     }
-        // } else if (key == 'ArrowUp'){
-        //     jumpAction.reset()
-        //     jumpAction.play()
-        // } else if (key == 'ArrowRight'){
-        //     if(cubeModel.position.x<lanePositions[2]){
-        //         goRightAction.reset()
-        //         goRightAction.play()
-        //     } 
-        // } else if (key == 'ArrowDown'){
-        //     duckAction.reset()
-        //     duckAction.play()
-        // }
-
         if (key == controlKeys[0][0]) {
             if(cubeModel.position.x>lanePositions[0]){
                 goLeftAction.reset()
@@ -266,17 +228,12 @@ function increaseScore() {
 }
 
 function randomizeControls() {
-    console.log(localStorage.getItem('controlKeys'))
     let keys = JSON.parse(localStorage.getItem('controlKeys'))
-    console.log(keys)
     let j;
     for(let i=keys.length; i>0; i--){
         j = Math.floor(Math.random() * i)
-        console.log(i)
-        console.log(j)
         if(j!=i) keys[i-1] = [ keys[j], keys[j] = keys[i-1]][0]
     }
-    console.log(keys)
     localStorage.setItem('controlKeys', JSON.stringify(keys))
 }
 
@@ -313,9 +270,8 @@ function animate() {
 
 if(JSON.parse(localStorage.getItem('gameEnd'))){
     randomizeControls()
-    console.log(localStorage.getItem('controlKeys'))
     controlKeys = JSON.parse(localStorage.getItem('controlKeys'))
-    // localStorage.setItem('gameEnd', JSON.stringify(false))
+    localStorage.setItem('gameEnd', JSON.stringify(false))
 }
 setInterval(increaseScore, increaseScoreTimeDelay)
 addObstacles()
