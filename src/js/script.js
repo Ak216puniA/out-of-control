@@ -69,17 +69,12 @@ var barMixer;
 
 var cubeBoundingBox;
 var cubeModel;
-// var cubeBoundingBoxHelper;
 
 assetLoader.load(cube.href, function(gltf){
     cubeModel = gltf.scene
     scene.add(cubeModel)
-    // cubeBoundingBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
     cubeBoundingBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
     cubeBoundingBox.setFromObject(cubeModel.children[0])
-
-    // cubeBoundingBoxHelper = new THREE.Box3Helper(cubeModel, 0xffffff)
-    // scene.add( cubeBoundingBoxHelper );
 
     cubeModel.name = "cube"
     cubeMixer = new THREE.AnimationMixer(cubeModel)
@@ -267,10 +262,6 @@ function checkCollision() {
 
 function animate() {
 
-    // if(cubeModel && obstacles.length>0){
-    //     console.log(cubeModel.intersectsBox(obstacles[0]))
-    // }
-
     if(cubeModel && cubeBoundingBox){
         cubeBoundingBox.copy(cubeModel.children[0].geometry.boundingBox).applyMatrix4(cubeModel.children[0].matrixWorld)
     }
@@ -303,27 +294,16 @@ function animate() {
         obstacleBBs[i].copy(obstacles[i].children[0].geometry.boundingBox).applyMatrix4(obstacles[i].children[0].matrixWorld)
     }
 
-    // for(let i=0; i<obstacleBBs.length; i++){
-    //     obstacleBBs[i].copy(obstacles[i].children[0].geometry.boundingBox).applyMatrix4(obstacles[i].children[0].matrixWorld)
-    // }
-
     checkCollision()
 
     renderer.render(scene, camera)
 }
 
-// setInterval(function(){
-//     console.log("------------------------------------------------")
-//     if(cubeModel) console.log(cubeModel)
-//     if(cubeBoundingBox) console.log(cubeBoundingBox)
-//     console.log("------------------------------------------------")
-// }, 5000)
-
-// if(JSON.parse(localStorage.getItem('gameEnd'))){
-//     randomizeControls()
-//     controlKeys = JSON.parse(localStorage.getItem('controlKeys'))
-//     localStorage.setItem('gameEnd', JSON.stringify(false))
-// }
+if(JSON.parse(localStorage.getItem('gameEnd'))){
+    randomizeControls()
+    controlKeys = JSON.parse(localStorage.getItem('controlKeys'))
+    localStorage.setItem('gameEnd', JSON.stringify(false))
+}
 setInterval(increaseObstacleSpeed, 250)
 setInterval(increaseScore, increaseScoreTimeDelay)
 addObstacles()
