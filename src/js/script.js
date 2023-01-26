@@ -74,7 +74,8 @@ assetLoader.load(cube.href, function(gltf){
     cubeModel = gltf.scene
     scene.add(cubeModel)
     cubeBoundingBox = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
-    cubeBoundingBox.setFromObject(cubeModel)
+    cubeBoundingBox.setFromObject(cubeModel.children[0])
+
     cubeModel.name = "cube"
     cubeMixer = new THREE.AnimationMixer(cubeModel)
     const clips = gltf.animations
@@ -168,7 +169,7 @@ assetLoader.load(spikes.href, function(gltf){
     obstacleTypes.push(spikesModel)
     obstacles.push(spikesModel)
     var obstacleBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
-    obstacleBB.setFromObject(spikesModel)
+    obstacleBB.setFromObject(spikesModel.children[0])
     obstacleBBs.push(obstacleBB)
 })
 
@@ -181,7 +182,7 @@ assetLoader.load(wall.href, function(gltf){
     obstacleTypes.push(wallModel)
     obstacles.push(wallModel)
     var obstacleBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
-    obstacleBB.setFromObject(wallModel)
+    obstacleBB.setFromObject(wallModel.children[0])
     obstacleBBs.push(obstacleBB)
 })
 
@@ -194,7 +195,7 @@ assetLoader.load(bar.href, function(gltf){
     obstacleTypes.push(barModel)
     obstacles.push(barModel)
     var obstacleBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
-    obstacleBB.setFromObject(barModel)
+    obstacleBB.setFromObject(barModel.children[0])
     obstacleBBs.push(obstacleBB)
 })
 
@@ -211,7 +212,7 @@ function createObstacle(){
         newObstacle.position.copy(obstaclePosition)
         obstacles.push(newObstacle)
         var obstacleBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
-        obstacleBB.setFromObject(newObstacle)
+        obstacleBB.setFromObject(newObstacle.children[0])
         obstacleBBs.push(obstacleBB)
     }
 }
@@ -242,7 +243,29 @@ function increaseObstacleSpeed() {
     if(obstacleAppearanceTimeDelay>0.5) obstacleAppearanceTimeDelay-=0.001
 }
 
+function checkCollision() {
+    if(cubeModel && cubeBoundingBox && obstacleBBs.length>0){
+        let check1, check2;
+        for(let i=0; i<obstacleBBs.length; i++){
+            check1 = cubeBoundingBox.intersectsBox(obstacleBBs[i])
+            if(check1){
+                check2 = obstacles[i].name==='bar'
+                check2 = check2 && cubeModel.position.x===obstacles[i].position.x
+                check2 = check2 && cubeBoundingBox.max.y - cubeBoundingBox.min.y < 1
+                if(!check2){
+                    console.log("BOOM!!")
+                }
+            }
+        }
+    }
+}
+
 function animate() {
+
+    if(cubeModel && cubeBoundingBox){
+        cubeBoundingBox.copy(cubeModel.children[0].geometry.boundingBox).applyMatrix4(cubeModel.children[0].matrixWorld)
+    }
+
     if(cubeMixer) cubeMixer.update(clock.getDelta())
 
     if(obstacles.length>0){
@@ -268,7 +291,10 @@ function animate() {
 
     for(let i=0; i<obstacles.length; i++){
         obstacles[i].position.z += obstacleSpeed
+        obstacleBBs[i].copy(obstacles[i].children[0].geometry.boundingBox).applyMatrix4(obstacles[i].children[0].matrixWorld)
     }
+
+    checkCollision()
 
     renderer.render(scene, camera)
 }
