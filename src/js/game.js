@@ -2,11 +2,6 @@ const pausePauseIcon = '<i class="fa-solid fa-pause" id="gamePauseIcon"></i>'
 const pausePlayIcon = '<i class="fa-solid fa-play" id="gamePauseIcon"></i>'
 
 document.getElementById('gamePauseIconDiv').onclick = function() {
-    // if(localStorage.getItem('globalScore')>localStorage.getItem('globalHighScore')){
-    //     localStorage.setItem('globalHighScore',localStorage.getItem('globalScore'))
-    // }
-    // localStorage.setItem('gameEnd', JSON.stringify(false))
-    // window.location.href = "game-pause.html"
     localStorage.setItem('pauseGame', JSON.stringify(!(JSON.parse(localStorage.getItem('pauseGame')))))
     document.getElementById('gamePauseIconDiv').innerHTML = JSON.parse(localStorage.getItem('pauseGame')) ? pausePlayIcon : pausePauseIcon
 }

@@ -52,7 +52,6 @@ document.getElementById('playAgainButton').onclick = function (){
 
 if(document.getElementById('resume')){
     document.getElementById('resume').onclick = function (){
-        // localStorage.setItem('gameEnd', JSON.stringify(false))
         window.location.href = "game.html"
     }
 }
