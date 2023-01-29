@@ -54,3 +54,7 @@
 #gameStopIconDiv:hover{
     background-color: rgba(205, 97, 85, 0.25 );
 }
+
+#globalScore{
+    font-size: 20px;
+}

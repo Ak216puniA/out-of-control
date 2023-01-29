@@ -17,11 +17,6 @@ const camera = new THREE.PerspectiveCamera(75, gameWindowWidth/gameWindowHeight,
 const orbit = new OrbitControls(camera, renderer.domElement)
 const textureLoader = new THREE.TextureLoader()
 
-// const gridHelper = new THREE.GridHelper(100,100)
-// scene.add(gridHelper)
-// const axesHelper = new THREE.AxesHelper(1000)
-// scene.add(axesHelper)
-
 const cube = new URL('../assets/cube_actions.glb', import.meta.url)
 const spikes = new URL('../assets/spikes.glb', import.meta.url)
 const wall = new URL('../assets/wall.glb', import.meta.url)
@@ -35,7 +30,7 @@ const cubeActionSpeedMultiplier = 3
 const increaseScoreTimeDelay = 200
 const clock = new THREE.Clock()
 var obstacleSpeed = 0.1
-var obstacleAppearanceTimeDelay = 2
+var obstacleAppearanceTimeDelay = 1.5
 var score = 0
 var controlKeys = JSON.parse(localStorage.getItem('controlKeys'))
 
@@ -58,8 +53,6 @@ scene.add(ambientLight);
 const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
 scene.add(directionalLight);
 directionalLight.position.set(0, 10, 0);
-// const dLightHelper = new THREE.DirectionalLightHelper(directionalLight);
-// scene.add(dLightHelper)
 
 const assetLoader = new GLTFLoader()
 
@@ -212,14 +205,18 @@ function createObstacle(){
 }
 
 function addObstacles() {
-    var randomDelay = (Math.random() * obstacleAppearanceTimeDelay) + 1;
-    createObstacle()
-    setTimeout(addObstacles, randomDelay*1000)
+    if(!JSON.parse(localStorage.getItem('pauseGame'))){
+        var randomDelay = (Math.random() * obstacleAppearanceTimeDelay) + 1;
+        createObstacle()
+        setTimeout(addObstacles, randomDelay*1000)
+    }
 }
 
 function increaseScore() {
-    localStorage.setItem('globalScore', ++score)
-    document.getElementById('globalScore').innerHTML = score
+    if(!JSON.parse(localStorage.getItem('pauseGame'))){
+        localStorage.setItem('globalScore', ++score)
+        document.getElementById('globalScore').innerHTML = score
+    }
 }
 
 function randomizeControls() {
@@ -233,8 +230,10 @@ function randomizeControls() {
 }
 
 function increaseObstacleSpeed() {
-    obstacleSpeed+=0.0005
-    if(obstacleAppearanceTimeDelay>0.5) obstacleAppearanceTimeDelay-=0.001
+    if(!JSON.parse(localStorage.getItem('pauseGame'))){
+        obstacleSpeed+=0.0008
+        if(obstacleAppearanceTimeDelay>0.5) obstacleAppearanceTimeDelay-=0.002
+    }  
 }
 
 function checkCollision() {
@@ -257,19 +256,24 @@ function stopGame() {
         if(obstacleSpeed<0){
             clearInterval(killGame)
             setTimeout(function(){
+                if(parseInt(localStorage.getItem('globalScore'))>parseInt(localStorage.getItem('globalHighScore'))){
+                    localStorage.setItem('globalHighScore',localStorage.getItem('globalScore'))
+                }
+                localStorage.setItem('gameEnd', JSON.stringify(true))
+                localStorage.setItem('pauseGame', JSON.stringify(false))
                 window.location.href = "game-end.html"
             },800)
             return
         }
-        obstacleSpeed-=0.002
+        obstacleSpeed-=0.01
     },200)
 }
 
 function animate() {
 
-    if(cubeModel && cubeBoundingBox){
-        cubeBoundingBox.copy(cubeModel.children[0].geometry.boundingBox).applyMatrix4(cubeModel.children[0].matrixWorld)
-    }
+    if(JSON.parse(localStorage.getItem('pauseGame'))) return
+
+    if(cubeModel && cubeBoundingBox) cubeBoundingBox.copy(cubeModel.children[0].geometry.boundingBox).applyMatrix4(cubeModel.children[0].matrixWorld)
 
     if(cubeMixer) cubeMixer.update(clock.getDelta())
 
@@ -304,11 +308,11 @@ function animate() {
     renderer.render(scene, camera)
 }
 
-// if(JSON.parse(localStorage.getItem('gameEnd'))){
-//     randomizeControls()
-//     controlKeys = JSON.parse(localStorage.getItem('controlKeys'))
-//     localStorage.setItem('gameEnd', JSON.stringify(false))
-// }
+if(JSON.parse(localStorage.getItem('gameEnd'))){
+    randomizeControls()
+    controlKeys = JSON.parse(localStorage.getItem('controlKeys'))
+    localStorage.setItem('gameEnd', JSON.stringify(false))
+}
 setInterval(increaseObstacleSpeed, 250)
 setInterval(increaseScore, increaseScoreTimeDelay)
 addObstacles()
