@@ -1,3 +1,24 @@
+// console.log(chrome.windows)
+
+// chrome.windows.update(
+//     windowId ,
+//     updateInfo: object,
+//     callback?: function,
+//   )
+
+// document.documentElement.requestFullscreen()
+
+// document.getElementById('goFullscreenButton').addEventListener("click", function() {
+//     var
+//           el = document.documentElement
+//         , rfs =
+//                el.requestFullScreen
+//             || el.webkitRequestFullScreen
+//             || el.mozRequestFullScreen
+//     ;
+//     rfs.call(el);
+// });
+
 const screenHeight =  window.innerHeight
 const screenWidth = window.innerWidth
 
