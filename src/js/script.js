@@ -17,11 +17,6 @@ const camera = new THREE.PerspectiveCamera(75, gameWindowWidth/gameWindowHeight,
 const orbit = new OrbitControls(camera, renderer.domElement)
 const textureLoader = new THREE.TextureLoader()
 
-// const gridHelper = new THREE.GridHelper(100,100)
-// scene.add(gridHelper)
-// const axesHelper = new THREE.AxesHelper(1000)
-// scene.add(axesHelper)
-
 const cube = new URL('../assets/cube_actions.glb', import.meta.url)
 const spikes = new URL('../assets/spikes.glb', import.meta.url)
 const wall = new URL('../assets/wall.glb', import.meta.url)
@@ -35,7 +30,7 @@ const cubeActionSpeedMultiplier = 3
 const increaseScoreTimeDelay = 200
 const clock = new THREE.Clock()
 var obstacleSpeed = 0.1
-var obstacleAppearanceTimeDelay = 3
+var obstacleAppearanceTimeDelay = 1.5
 var score = 0
 var controlKeys = JSON.parse(localStorage.getItem('controlKeys'))
 
@@ -58,15 +53,10 @@ scene.add(ambientLight);
 const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
 scene.add(directionalLight);
 directionalLight.position.set(0, 10, 0);
-const dLightHelper = new THREE.DirectionalLightHelper(directionalLight);
-scene.add(dLightHelper)
 
 const assetLoader = new GLTFLoader()
-var cubeMixer;
-var spikesMixer;
-var wallMixer;
-var barMixer;
 
+var cubeMixer;
 var cubeBoundingBox;
 var cubeModel;
 
@@ -164,8 +154,7 @@ assetLoader.load(spikes.href, function(gltf){
     const spikesModel = gltf.scene
     scene.add(spikesModel)
     spikesModel.name = 'spikes'
-    spikesModel.position.set(lanePositions[0],0,-20)
-    spikesMixer = new THREE.AnimationMixer(spikesModel)
+    spikesModel.position.set(lanePositions[0],0,-60)
     obstacleTypes.push(spikesModel)
     obstacles.push(spikesModel)
     var obstacleBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
@@ -178,7 +167,6 @@ assetLoader.load(wall.href, function(gltf){
     scene.add(wallModel)
     wallModel.name = 'wall'
     wallModel.position.set(lanePositions[1],0,-24)
-    wallMixer = new THREE.AnimationMixer(wallModel)
     obstacleTypes.push(wallModel)
     obstacles.push(wallModel)
     var obstacleBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
@@ -190,8 +178,7 @@ assetLoader.load(bar.href, function(gltf){
     const barModel = gltf.scene
     scene.add(barModel)
     barModel.name = 'bar'
-    barModel.position.set(lanePositions[2],0,-16)
-    barMixer = new THREE.AnimationMixer(barModel)
+    barModel.position.set(lanePositions[2],0,-48)
     obstacleTypes.push(barModel)
     obstacles.push(barModel)
     var obstacleBB = new THREE.Box3(new THREE.Vector3(), new THREE.Vector3())
@@ -218,14 +205,18 @@ function createObstacle(){
 }
 
 function addObstacles() {
-    var randomDelay = (Math.random() * obstacleAppearanceTimeDelay) + 1;
-    createObstacle()
-    setTimeout(addObstacles, randomDelay*1000)
+    if(!JSON.parse(localStorage.getItem('pauseGame'))){
+        var randomDelay = (Math.random() * obstacleAppearanceTimeDelay) + 1;
+        createObstacle()
+        setTimeout(addObstacles, randomDelay*1000)
+    }
 }
 
 function increaseScore() {
-    localStorage.setItem('globalScore', ++score)
-    document.getElementById('globalScore').innerHTML = score
+    if(!JSON.parse(localStorage.getItem('pauseGame'))){
+        localStorage.setItem('globalScore', ++score)
+        document.getElementById('globalScore').innerHTML = score
+    }
 }
 
 function randomizeControls() {
@@ -239,12 +230,14 @@ function randomizeControls() {
 }
 
 function increaseObstacleSpeed() {
-    obstacleSpeed+=0.0005
-    if(obstacleAppearanceTimeDelay>0.5) obstacleAppearanceTimeDelay-=0.001
+    if(!JSON.parse(localStorage.getItem('pauseGame'))){
+        obstacleSpeed+=0.0008
+        if(obstacleAppearanceTimeDelay>0.5) obstacleAppearanceTimeDelay-=0.002
+    }  
 }
 
 function checkCollision() {
-    if(cubeModel && cubeBoundingBox && obstacleBBs.length>0){
+    if(cubeModel && cubeBoundingBox && obstacleBBs.length>0 && score>50){
         let check1, check2;
         for(let i=0; i<obstacleBBs.length; i++){
             check1 = cubeBoundingBox.intersectsBox(obstacleBBs[i])
@@ -252,19 +245,35 @@ function checkCollision() {
                 check2 = obstacles[i].name==='bar'
                 check2 = check2 && cubeModel.position.x===obstacles[i].position.x
                 check2 = check2 && cubeBoundingBox.max.y - cubeBoundingBox.min.y < 1
-                if(!check2){
-                    console.log("BOOM!!")
-                }
+                if(!check2) stopGame()
             }
         }
     }
 }
 
+function stopGame() {
+    var killGame = setInterval(function(){
+        if(obstacleSpeed<0){
+            clearInterval(killGame)
+            setTimeout(function(){
+                if(parseInt(localStorage.getItem('globalScore'))>parseInt(localStorage.getItem('globalHighScore'))){
+                    localStorage.setItem('globalHighScore',localStorage.getItem('globalScore'))
+                }
+                localStorage.setItem('gameEnd', JSON.stringify(true))
+                localStorage.setItem('pauseGame', JSON.stringify(false))
+                window.location.href = "game-end.html"
+            },800)
+            return
+        }
+        obstacleSpeed-=0.01
+    },200)
+}
+
 function animate() {
 
-    if(cubeModel && cubeBoundingBox){
-        cubeBoundingBox.copy(cubeModel.children[0].geometry.boundingBox).applyMatrix4(cubeModel.children[0].matrixWorld)
-    }
+    if(JSON.parse(localStorage.getItem('pauseGame'))) return
+
+    if(cubeModel && cubeBoundingBox) cubeBoundingBox.copy(cubeModel.children[0].geometry.boundingBox).applyMatrix4(cubeModel.children[0].matrixWorld)
 
     if(cubeMixer) cubeMixer.update(clock.getDelta())
 

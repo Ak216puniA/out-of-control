@@ -8,5 +8,5 @@ const defaultControlKeys = [
     ['s','ArrowDown']
 ]
 localStorage.setItem('controlKeys', JSON.stringify(defaultControlKeys))
-console.log(localStorage.getItem('controlKeys'))
 localStorage.setItem('gameEnd', JSON.stringify(true))
+localStorage.setItem('pauseGame', JSON.stringify(false))
